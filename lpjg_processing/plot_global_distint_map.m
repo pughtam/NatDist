@@ -10,21 +10,21 @@
 
 use_cvegmask=true; %Mask by a minimum simulated vegetation biomass density
 use_fmask=true; %Mask by current forest area
+ccmask=true; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
 distvar=true; %Plot as disturbance return interval (true) or raw variable (false)
 logscale=true; %Plot map using log colour scale
-limitscale=true; %Cap colour scale at 1000 years
+limitscale=false; %Cap colour scale at 1000 years
 dimplot=1; %Column number in input file containing the disturbance rate
 
-makeplot=true; %Make a plot
+makeplot=false; %Make a plot
 writetxt=true; %Write array to text file
-outfile_name='simplemodel_best_est_100patch_10pCanopyCover.txt';
+outfile_name='simplemodel_closedcanopy_low_est_5pClosedCanopyCover_nolimit.txt';
 
-lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est_100patch';
+lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_closedcanopy_low_est';
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
-fmask_var='canopy_cover_frac'; %Name of variable in fmask file to use
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
 ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask file
 
@@ -45,9 +45,17 @@ end
 
 % Create mask to exclude grid cells where at least 10% canopy is not reached
 if use_fmask
-    ffrac=ncread([fmask_dir,'/',fmask_file],fmask_var)';
-    fmask=NaN(size(ffrac));
-    fmask(ffrac>=10)=1;
+    if ccmask
+        fmask_var='forested_50_percent'; %Name of variable in fmask file to use
+        ffrac=ncread([fmask_dir,'/',fmask_file],fmask_var)';
+        fmask=NaN(size(ffrac));
+        fmask(ffrac>=5)=1;
+    else
+        fmask_var='canopy_cover_frac'; %Name of variable in fmask file to use
+        ffrac=ncread([fmask_dir,'/',fmask_file],fmask_var)';
+        fmask=NaN(size(ffrac));
+        fmask(ffrac>=10)=1;
+    end
 end
 
 %Read in the biome mask and format to 0.5 x 0.5 degrees
@@ -147,7 +155,7 @@ if makeplot
     colormap(cmap)
     axesm('MapProjection','robinson','MapLatLimit',[23 80])
     hold on
-    l1=pcolorm(lat,lon,oceanm);
+    l1=pcolorm(lats,lons,oceanm);
     set(l1,'linestyle','none')
     p1=pcolorm(lats,lons,plotarray);
     set(p1,'linestyle','none')
