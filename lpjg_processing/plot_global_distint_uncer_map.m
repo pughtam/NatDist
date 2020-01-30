@@ -52,7 +52,6 @@ dist_high(dist_high==0)=NaN;
 
 %Create an array for plotting the disturbance interval
 
-%Calculate the difference between the two disturbance interval sets
 distint_base=1./dist_base(:,:,dimplot);
 distint_low=1./dist_low(:,:,dimplot);
 distint_high=1./dist_high(:,:,dimplot);
@@ -122,11 +121,10 @@ end
 if writetxt
     plotarray_out=plotarray;
     plotarray_out(isnan(plotarray))=-9999;
-    plotarray_out=int32(plotarray_out);
     
     fid=fopen(outfile_name,'w');
     for yy=360:-1:1
-        fprintf(fid,repmat('%7d',1,720),plotarray_out(yy,:));
+        fprintf(fid,repmat('%7.3f',1,720),plotarray_out(yy,:));
         fprintf(fid,'\n');
     end
     clear yy
