@@ -14,6 +14,8 @@ use_bmask=true; %Mask by temperate/boreal biomes
 
 writetxt=true; %Write out to text file
 
+outfile_name='simplemodel_best_est_100patch_10pCanopyCover_biomes_v2.txt';
+
 lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est_100patch';
 %lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/100_flat_orig_r5511/postproc/';
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
