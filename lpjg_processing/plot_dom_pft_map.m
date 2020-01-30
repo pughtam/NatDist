@@ -1,6 +1,7 @@
 % Script to make quick map of dominant PFT and biomes (latter based on Smith et al., 2014, Biogeosciences, 11, 2027?2054)
 %
 % Dependencies:
+% - readmasks_func.m
 % - cbrewer (https://uk.mathworks.com/matlabcentral/fileexchange/34087-cbrewer-colorbrewer-schemes-for-matlab)
 %
 %T. Pugh
@@ -10,6 +11,8 @@ use_cvegmask=true; %Mask by a minimum simulated vegetation biomass density
 use_fmask=true; %Mask by current forest area
 ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
+
+writetxt=true; %Write out to text file
 
 lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est_100patch';
 %lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/100_flat_orig_r5511/postproc/';
@@ -73,42 +76,43 @@ biomenames={'Boreal decid forest','Boreal ever forest','Temp/boreal mix fo.','Te
     'Moist savannas','Dry savannas','Tall grassland','Dry grassland','Xeric wood/shrub','Arid shrub/steppe',...
     'Desert','Arctic/alpine tundra'};
 
+%NOTE: Below differs from Smith et al. (2014) in that treelai>2, rather than >2.5.
 biome=NaN(360,720);
 for xx=1:720
     for yy=1:360
-        if (treelai(yy,xx) > 2.5) && (trbelai(yy,xx) > (0.6*treelai(yy,xx)))
+        if (treelai(yy,xx) > 2.0) && (trbelai(yy,xx) > (0.6*treelai(yy,xx)))
             biome(yy,xx)=9; %Trop rain forest
-        elseif (treelai(yy,xx) > 2.5 && (lai(yy,xx,8) > 0.6*treelai(yy,xx)))
+        elseif (treelai(yy,xx) > 2.0 && (lai(yy,xx,8) > 0.6*treelai(yy,xx)))
             biome(yy,xx)=10; %Trop decid forest
-        elseif (treelai(yy,xx) > 2.5 && (trlai(yy,xx) > 0.5*treelai(yy,xx)) && ...
+        elseif (treelai(yy,xx) > 2.0 && (trlai(yy,xx) > 0.5*treelai(yy,xx)) && ...
                 ((trbelai(yy,xx) > lai(yy,xx,7) && trbelai(yy,xx) > lai(yy,xx,5)) ||...
                 (lai(yy,xx,12) > lai(yy,xx,7) && lai(yy,xx,12) > lai(yy,xx,5))))
             biome(yy,xx)=8; %Trop season forest
-        elseif (treelai(yy,xx) > 2.5) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) &&...
+        elseif (treelai(yy,xx) > 2.0) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) &&...
                 ((bneelai(yy,xx) > lai(yy,xx,3)) || (lai(yy,xx,6) > lai(yy,xx,3)))
             biome(yy,xx)=2; %Boreal ever forest
-        elseif (treelai(yy,xx) > 2.5) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) &&...
+        elseif (treelai(yy,xx) > 2.0) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) &&...
                 (lai(yy,xx,3) > bneelai(yy,xx)) && (lai(yy,xx,3) > lai(yy,xx,6))
             biome(yy,xx)=1; %Boreal decid forest
-        elseif (treelai(yy,xx) > 2.5) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,7) > 0.5*treelai(yy,xx))
+        elseif (treelai(yy,xx) > 2.0) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,7) > 0.5*treelai(yy,xx))
             biome(yy,xx)=6; %Temp broad ever fo.
-        elseif (treelai(yy,xx) > 2.5) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,5) > 0.5*treelai(yy,xx))
+        elseif (treelai(yy,xx) > 2.0) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,5) > 0.5*treelai(yy,xx))
             biome(yy,xx)=5; %Temp decid forest
-        elseif (treelai(yy,xx) > 2.5) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,4) > 0.5*treelai(yy,xx))
+        elseif (treelai(yy,xx) > 2.0) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,4) > 0.5*treelai(yy,xx))
             biome(yy,xx)=4; %Temp conifer forest
-        elseif (treelai(yy,xx) > 2.5) && (btlai(yy,xx) > 0.2*treelai(yy,xx))
+        elseif (treelai(yy,xx) > 2.0) && (btlai(yy,xx) > 0.2*treelai(yy,xx))
             biome(yy,xx)=3; %Temp/boreal mix fo.
-        elseif (treelai(yy,xx) > 2.5)
+        elseif (treelai(yy,xx) > 2.0)
             biome(yy,xx)=7; %Temp mixed forest
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.5) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) && (bneelai(yy,xx) > lai(yy,xx,3) || lai(yy,xx,6) > lai(yy,xx,3))
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) && (bneelai(yy,xx) > lai(yy,xx,3) || lai(yy,xx,6) > lai(yy,xx,3))
             biome(yy,xx)=2; %Boreal ever forest
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.5) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,3) > bneelai(yy,xx) && lai(yy,xx,3) > lai(yy,xx,6))
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,3) > bneelai(yy,xx) && lai(yy,xx,3) > lai(yy,xx,6))
             biome(yy,xx)=1; %Boreal decid forest
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.5) && (treelai(yy,xx) > 0.8*totlai(yy,xx))
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0) && (treelai(yy,xx) > 0.8*totlai(yy,xx))
             biome(yy,xx)=15; %Xeric wood/shrub
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.5) && (totlai(yy,xx) > 2.5)
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0) && (totlai(yy,xx) > 2.0)
             biome(yy,xx)=11; %Moist savannas
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.5)
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0)
             biome(yy,xx)=12; %Dry savannas
         elseif (treelai(yy,xx) < 0.5) && (grasslai(yy,xx) > 0.2) && (lats(yy,xx) > 54)
             biome(yy,xx)=18; %Arctic/alpine tundra
@@ -211,4 +215,20 @@ c1=colorbar;
 set(c1,'FontSize',12,'FontWeight','Bold')
 set(c1,'Limits',[1 cmax])
 set(c1,'Ticks',1:18,'TickLabels',biomenames)
-        
+
+
+%--- Write out to text file ---
+
+if writetxt
+    biome_out=biome;
+    biome_out(isnan(biome))=-9999;
+    biome_out=int32(biome_out);
+    
+    fid=fopen(outfile_name,'w');
+    for yy=360:-1:1
+        fprintf(fid,repmat('%7d',1,720),biome_out(yy,:));
+        fprintf(fid,'\n');
+    end
+    clear yy
+    fclose(fid);
+end
