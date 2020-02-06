@@ -1,4 +1,4 @@
-function [cvegmask,fmask,bmask]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir)
+function [cvegmask,fmask,bmask,ffrac]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir)
 % Create the masks for low vegetation C mass, low forested area or non temperate/boreal biomes
 %
 % T. Pugh
@@ -31,6 +31,7 @@ if use_fmask
 else
     fmask=NaN;
 end
+ffrac=ffrac/100; %Convert from percentage to fraction for output
 
 %Read in the biome mask and format to 0.5 x 0.5 degrees
 if use_bmask
