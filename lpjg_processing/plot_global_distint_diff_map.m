@@ -18,15 +18,21 @@ ccmask=true; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
 logscale=false; %Plot map using quasi-log colour scale
-limitscale=false; %Cap disturbance interval at 1000 years
+limitscale=true; %Cap disturbance interval at 1000 years
 dimplot=1; %Column number in input file containing the disturbance rate
 
 makeplot=true; %Make a plot
-writetxt=true; %Write array to text file
-outfile_name='simplemodel_best_est_5pClosedCanopyCover_diffClosedCanopy.txt';
+writetxt=false; %Write array to text file
+outfile_name='simplemodel_closedcanopy_best_est_100patch_5pClosedCanopyCover_Pugh2019diff.txt';
+
+secfilenetcdf=true; %Read the second file from a netcdf (true) or from LPJ-GUESS output (false)
 
 lpjg_dir1='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est';
-lpjg_dir2='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_closedcanopy_best_est';
+%If reading output from LPJ-GUESS must specify folder (readlpjgdata=true)
+lpjg_dir2='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_closedcanopy_best_est_100patch';
+%If reading output from netcdf file must specify file location and variable name (readlpjgdata=false)
+netcdf_file='/Users/pughtam/Documents/GAP_and_other_work/Disturbance/netcdfs_for_deposition/tauO/tauO_standard_forest-area_LUcorrected.nc';
+netcdf_varname='tauO';
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
@@ -38,9 +44,26 @@ ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask
 % Read disturbance interval
 dist1=squeeze(lpj_to_grid_func_centre([lpjg_dir1,'/distprob_2001_2014'],1,0));
 dist1(dist1==0)=NaN;
+distint1=1./dist1(:,:,dimplot);
 
-dist2=squeeze(lpj_to_grid_func_centre([lpjg_dir2,'/distprob_2001_2014'],1,0));
-dist2(dist2==0)=NaN;
+if secfilenetcdf
+    % Read disturbance interval from netcdf
+    distint2_1deg=ncread(netcdf_file,netcdf_varname)';
+    % Resample to 0.5 degree
+    distint2=NaN(360,720);
+    for xx=1:720
+        for yy=1:360
+            xx_s=ceil(xx/2);
+            yy_s=ceil(yy/2);
+            distint2(yy,xx)=distint2_1deg(yy_s,xx_s);
+        end
+    end
+    clear xx yy xx_s yy_s distint2_1deg
+else
+    dist2=squeeze(lpj_to_grid_func_centre([lpjg_dir2,'/distprob_2001_2014'],1,0));
+    dist2(dist2==0)=NaN;
+    distint2=1./dist2(:,:,dimplot);
+end
 
 [cvegmask,fmask,bmask]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir1,fmask_dir,fmask_file,bmask_dir);
 
@@ -48,10 +71,6 @@ dist2(dist2==0)=NaN;
 %--- Data processing ---
 
 %Create an array for plotting the disturbance interval
-
-%Calculate the difference between the two disturbance interval sets
-distint1=1./dist1(:,:,dimplot);
-distint2=1./dist2(:,:,dimplot);
 
 if limitscale
     distint1(distint1>1000)=1000;
