@@ -13,7 +13,7 @@
 
 use_cvegmask=true; %Mask by a minimum simulated vegetation biomass density
 use_fmask=true; %Mask by current forest area
-ccmask=true; %Use a closed-canopy forest mask (if use_fmask=true)
+ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
 distvar=true; %Plot as disturbance return interval (true) or raw variable (false)
@@ -21,11 +21,12 @@ logscale=true; %Plot map using log colour scale
 limitscale=false; %Cap colour scale at 1000 years
 dimplot=1; %Column number in input file containing the disturbance rate
 
-makeplot=false; %Make a plot
-writetxt=true; %Write array to text file
-outfile_name='simplemodel_closedcanopy_low_est_5pClosedCanopyCover_nolimit.txt';
+makeplot=true; %Make a plot
+writetxt=false; %Write array to text file
+writenetcdf=true; %Write array to netcdf file
+outfile_name='simplemodel_best_est_100patch_10pCanopyCover_nolimit';
 
-lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_closedcanopy_low_est';
+lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est_100patch';
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
@@ -142,11 +143,55 @@ if writetxt
     plotarray_out(isnan(plotarray))=-9999;
     plotarray_out=int32(plotarray_out);
     
-    fid=fopen(outfile_name,'w');
+    fid=fopen([outfile_name,'.txt'],'w');
     for yy=360:-1:1
         fprintf(fid,repmat('%7d',1,720),plotarray_out(yy,:));
         fprintf(fid,'\n');
     end
     clear yy
     fclose(fid);
+end
+
+%--- Write out to netcdf file ---
+
+if writenetcdf
+    
+    fprintf('Creating netcdf file\n')
+    
+    if logscale
+        plotarray_out=10.^(plotarray);
+    else
+        plotarray_out=plotarray;
+    end
+    
+    minlat=-89.75;
+    maxlat=89.75;
+    minlon=-179.75;
+    maxlon=179.75;
+    gridspace=0.5;
+    
+    latgrid=minlat:gridspace:maxlat;
+    longrid=minlon:gridspace:maxlon;
+    nlat=length(latgrid);
+    nlon=length(longrid);
+    
+    outfile=[outfile_name,'.nc'];
+    
+    nccreate(outfile,'latitude','Dimensions',{'latitude',nlat})
+    ncwrite(outfile,'latitude',latgrid)
+    ncwriteatt(outfile,'latitude','units','degrees_north');
+    nccreate(outfile,'longitude','Dimensions',{'longitude',nlon})
+    ncwrite(outfile,'longitude',longrid)
+    ncwriteatt(outfile,'longitude','units','degrees_east');
+    
+    nccreate(outfile,'tau','Dimensions',{'longitude','latitude'},'DeflateLevel',9)
+    
+    ncwrite(outfile,'tau',plotarray_out')
+    ncwriteatt(outfile,'tau','longname','Modelled disturbance rotation time')
+    ncwriteatt(outfile,'tau','units','years')
+    
+    ncwriteatt(outfile,'/','Institution','University of Birmingham, UK');
+    ncwriteatt(outfile,'/','Contact','Thomas Pugh, t.a.m.pugh@bham.ac.uk');
+    ncwriteatt(outfile,'/','Version',['Version 1: ',date]);
+    
 end
