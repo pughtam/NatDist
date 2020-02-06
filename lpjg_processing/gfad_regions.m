@@ -25,8 +25,8 @@ new_zealand=151;
 mongolia=152;
 kazak=153;
 
-regionnames={'Rest of world','West Russia','Mid Russia','East Russia','East US',...
-    'West US','Alaska','East Canada','West Canada','South China','Mid China',...
+regionnames={'Rest of world','West Russia','Mid Russia','East Russia','North-East US',...
+    'South-East US','West US','Alaska','East Canada','West Canada','South China','Mid China',...
     'North China','Mid/South Europe','North Europe','Japan','Korea','New Zealand',...
     'Mongolia','Kazakstan'};
 
@@ -36,30 +36,31 @@ new_region(gfad_region==russia & lons<60 & lons>0)=2; %West Russia
 new_region(gfad_region==russia & lons>=60 & lons <=120)=3; %Mid Russia
 new_region(gfad_region==russia & (lons>120 | lons<0))=4; %East Russia
 for nn=1:length(us)
-    new_region(gfad_region==us(nn) & lons>-100)=5; %East US
-    new_region(gfad_region==us(nn) & lons<=-100)=6; %West US
+    new_region(gfad_region==us(nn) & lons>-100 & lats>37)=5; %North-East US
+    new_region(gfad_region==us(nn) & lons>-100 & lats<=37)=6; %South-East US
+    new_region(gfad_region==us(nn) & lons<=-100)=7; %West US
 end
-new_region(gfad_region==alaska)=7;
+new_region(gfad_region==alaska)=8;
 for nn=1:length(canada)
-    new_region(gfad_region==canada(nn) & lons>-100)=8; %East Canada
-    new_region(gfad_region==canada(nn) & lons<=-100)=9; %West Canada
+    new_region(gfad_region==canada(nn) & lons>-100)=9; %East Canada
+    new_region(gfad_region==canada(nn) & lons<=-100)=10; %West Canada
 end
 for nn=1:length(china)
-    new_region(gfad_region==china(nn) & lats<30)=10; %South China
-    new_region(gfad_region==china(nn) & lats>=30 & lats<40)=11; %Mid China
-    new_region(gfad_region==china(nn) & lats>=40)=12; %North China
+    new_region(gfad_region==china(nn) & lats<30)=11; %South China
+    new_region(gfad_region==china(nn) & lats>=30 & lats<40)=12; %Mid China
+    new_region(gfad_region==china(nn) & lats>=40)=13; %North China
 end
 for nn=1:length(europe)
-    new_region(gfad_region==europe(nn) & lats<55)=13; %South Europe
-    new_region(gfad_region==europe(nn) & lats>=55)=14; %North Europe
+    new_region(gfad_region==europe(nn) & lats<55)=14; %South Europe
+    new_region(gfad_region==europe(nn) & lats>=55)=15; %North Europe
 end
-new_region(gfad_region==japan)=15;
+new_region(gfad_region==japan)=16;
 for nn=1:length(korea)
-    new_region(gfad_region==korea(nn))=16;
+    new_region(gfad_region==korea(nn))=17;
 end
-new_region(gfad_region==new_zealand)=17;
-new_region(gfad_region==mongolia)=18;
-new_region(gfad_region==kazak)=19;
+new_region(gfad_region==new_zealand)=18;
+new_region(gfad_region==mongolia)=19;
+new_region(gfad_region==kazak)=20;
 clear nn
 
 %p1=pcolor(flipud(new_region'));
