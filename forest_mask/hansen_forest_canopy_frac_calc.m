@@ -5,17 +5,14 @@
 %Part 1 reads the forest cover data and makes the calculations.
 %Part 2 regrids and writes out a netcdf
 %
-%Developed from a script first published as part of Pugh et al. (2019, Nature Geoscience, 12, 730-735)
-%https://github.com/pughtam/GlobalDist
-%
 %T. Pugh
 %10.06.17
 
-part1=true; %Run first part?
+part1=false; %Run first part?
 part2=true; %Run second part?
 
-halfdegree=true; %Resolution for regridding in second part
-outfile='hansen_forested_canopy_frac_0p5deg.nc4'; %Name of output file for second part
+resolution='0p25deg'; %Resolution for regridding in second part, 1deg, 0p5deg or 0p25deg
+outfile_stub='hansen_forested_canopy_frac'; %Name of output file for second part
 
 cd /home/adf/pughtam/data/Hansen_forest_change
 
@@ -23,6 +20,13 @@ cd /home/adf/pughtam/data/Hansen_forest_change
 %Define some constants
 rad_earth=6.371e6; %m2
 circ_earth=2*pi*rad_earth;
+
+%-----
+%Settings checks
+
+if ~strcmp(resolution,'1deg') && ~strcmp(resolution,'0p5deg') && ~strcmp(resolution,'0p25deg')
+    error('resolution variable set to invalid value')
+end
 
 %-----
 if part1
@@ -35,8 +39,7 @@ forested_thres10=zeros(36000,18000);
 forested_thres50=zeros(36000,18000);
 totffrac_0p01deg=NaN(36000,18000);
 cc=0;
-for yy=5sh+-rab
-    :17 %Data starts from 50S (i.e. 50°S - 60°S)
+for yy=5:17 %Data starts from 50S (i.e. 50°S - 60°S)
     for xx=1:36
         cc=cc+1; %Counter for diagnostic output
         filename_farea=['Hansen_GFC2014_treecover2000_',yyind(yy,:),'_',xxind(xx,:),'.tif'];
@@ -116,14 +119,21 @@ load forested_frac_0_01_degree_thres10.mat
 
 %Now reprocess to a coarser resolution, defining a grid cell as forested
 %depending on whether its forested fraction is over a threshold.
-if halfdegree
+if strcmp(resolution,'0p5deg')
     %Make calculations at 0.5 degree resolution
     nlats=360;
     nlons=720;
     lons=-179.75:0.5:179.75;
     lats=-89.75:0.5:89.75;
     conv=50;
-else
+elseif strcmp(resolution,'0p25deg')
+    %Make calculations at 0.25 degree resolution
+    nlats=720;
+    nlons=1440;
+    lons=-179.875:0.25:179.875;
+    lats=-89.875:0.25:89.875;
+    conv=25;
+elseif strcmp(resolution,'1deg')
     %Then do it at 1 degree resolution
     nlats=180;
     nlons=360;
@@ -177,7 +187,7 @@ clear ilat_min ilat_max
 
 
 %Write output to netcdf file
-ncid = netcdf.create(outfile, 'NETCDF4');
+ncid = netcdf.create([outfile_stub,'_',resolution,'.nc4'], 'NETCDF4');
 
 dimid_lon=netcdf.defDim(ncid,'Longitude',nlons);
 dimid_lat=netcdf.defDim(ncid,'Latitude',nlats);
