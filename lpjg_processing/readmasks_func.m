@@ -31,7 +31,7 @@ if use_fmask
 else
     fmask=NaN;
 end
-ffrac=ffrac/100; %Convert from percentage to fraction for output
+ffrac=double(ffrac)/100; %Convert from percentage to fraction for output
 
 %Read in the biome mask and format to 0.5 x 0.5 degrees
 if use_bmask
