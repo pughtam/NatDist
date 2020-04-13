@@ -1,4 +1,4 @@
-function [new_region,regionnames]=gfad_regions(gfad_filepath_stan,onedeg)
+function [new_region,regionnames,regionnames_short]=gfad_regions(gfad_filepath_stan,onedeg)
 %Script to take the GFAD regions and process them into something more
 %accessible
 %
@@ -26,12 +26,15 @@ mongolia=152;
 kazak=153;
 
 regionnames={'Rest of world','West Russia','Mid Russia','East Russia','North-East US',...
-    'South-East US','West US','Alaska','East Canada','West Canada','South China','Mid China',...
-    'North China','Mid/South Europe','North Europe','Japan','Korea','New Zealand',...
-    'Mongolia','Kazakstan'};
+    'South-East US','West US','Alaska','East Canada','West Canada','South/Mid. China',...
+    'North China','South/Mid. Europe','North Europe','Japan and Korea','New Zealand'};
+
+regionnames_short={'RestOfWorld','WestRussia','MidRussia','EastRussia','NorthEastUS',...
+    'SouthEastUS','WestUS','Alaska','EastCanada','WestCanada','SouthMidChina',...
+    'NorthChina','SouthMidEurope','NorthEurope','JapanKorea','NewZealand'};
 
 new_region=zeros(size(gfad_region));
-new_region(gfad_region==tropics)=1;
+new_region(gfad_region==tropics)=1; %Rest of world
 new_region(gfad_region==russia & lons<60 & lons>0)=2; %West Russia
 new_region(gfad_region==russia & lons>=60 & lons <=120)=3; %Mid Russia
 new_region(gfad_region==russia & (lons>120 | lons<0))=4; %East Russia
@@ -46,21 +49,20 @@ for nn=1:length(canada)
     new_region(gfad_region==canada(nn) & lons<=-100)=10; %West Canada
 end
 for nn=1:length(china)
-    new_region(gfad_region==china(nn) & lats<30)=11; %South China
-    new_region(gfad_region==china(nn) & lats>=30 & lats<40)=12; %Mid China
-    new_region(gfad_region==china(nn) & lats>=40)=13; %North China
+    new_region(gfad_region==china(nn) & lats<40)=11; %South and Mid China
+    new_region(gfad_region==china(nn) & lats>=40)=12; %North China
 end
 for nn=1:length(europe)
-    new_region(gfad_region==europe(nn) & lats<55)=14; %South Europe
-    new_region(gfad_region==europe(nn) & lats>=55)=15; %North Europe
+    new_region(gfad_region==europe(nn) & lats<55)=13; %South and Mid Europe
+    new_region(gfad_region==europe(nn) & lats>=55)=14; %North Europe
 end
-new_region(gfad_region==japan)=16;
+new_region(gfad_region==japan)=15; %Merge Japan and Korea
 for nn=1:length(korea)
-    new_region(gfad_region==korea(nn))=17;
+    new_region(gfad_region==korea(nn))=15; %Merge Japan and Korea
 end
-new_region(gfad_region==new_zealand)=18;
-new_region(gfad_region==mongolia)=19;
-new_region(gfad_region==kazak)=20;
+new_region(gfad_region==new_zealand)=16;
+new_region(gfad_region==mongolia)=3; %Merge Mongolia with Mid Russia (because of minimal data)
+new_region(gfad_region==kazak)=3; %Merge Kazakstan with Mid Russia (because of minimal data)
 clear nn
 
 %p1=pcolor(flipud(new_region'));
