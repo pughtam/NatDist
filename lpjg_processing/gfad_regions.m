@@ -63,6 +63,9 @@ end
 new_region(gfad_region==new_zealand)=16;
 new_region(gfad_region==mongolia)=3; %Merge Mongolia with Mid Russia (because of minimal data)
 new_region(gfad_region==kazak)=3; %Merge Kazakstan with Mid Russia (because of minimal data)
+new_region(gfad_region==tropics & lats<23 & lats>-23 & lons<-32)=17; %South America tropics
+new_region(gfad_region==tropics & lats<23 & lats>-23 & lons>-32 & lons<55)=18; %Africa tropics
+new_region(gfad_region==tropics & lats<23 & lats>-23 & lons>55)=19; %South-east Asia tropics
 clear nn
 
 %p1=pcolor(flipud(new_region'));
