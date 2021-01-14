@@ -144,16 +144,16 @@ if plotgfad
 end
 
 %---
-% Make age class plots
+% Make age class plots for all relevant regions
 
 ages=5:10:150;
 
 figure
 cc=0;
 %for rr=[8 10 9 7 5 6 14 13 15 2 3 4 12 11]
-for rr=[10 9 7 5 6 14 13 15]
+for rr=[10 9 7 5 6 14 13 15 2 3 4 12 11]
     cc=cc+1;
-    ss(rr)=subplot(2,4,cc);
+    ss(rr)=subplot(4,4,cc);
     [p1 h1 h2]=plotyy(ages(1:14),age_bestest_luh_reg(rr,1:14),ages(15),age_bestest_luh_reg(rr,15));
     hold(p1(1)); hold(p1(2));
     set(h1,'marker','.','markersize',10,'color','k')
@@ -183,7 +183,7 @@ for rr=[10 9 7 5 6 14 13 15]
         h5=plot(p1(1),ages(1:14),gfad_fage_reg(rr,1:14));
         h6=plot(p1(2),ages(15),gfad_fage_reg(rr,15));
         plot(p1(2),ages(15),gfad_reg_max(rr,15),'g','markersize',5,'marker','v')
-        plot(p1(2),ages(15),gfad_reg_min(15,rr),'g','markersize',5,'marker','^')
+        plot(p1(2),ages(15),gfad_reg_min(rr,15),'g','markersize',5,'marker','^')
         set(h5,'marker','.','markersize',10,'color','g')
         set(h6,'marker','.','markersize',15,'color','g','linestyle','none')
         set(p1(1),'ycolor','k'); set(p1(2),'ycolor','k');
@@ -216,47 +216,58 @@ for rr=[10 9 7 5 6 14 13 15]
 end
 clear rr cc
 
+%---
+% Make age class plot with a simplified set of regions
+
+[age_bestest_regsim,regions_sim,nregionsim]=reg_simplify(age_bestest_reg,nage);
+[age_bestest_regsim_min]=reg_simplify(age_bestest_reg_min,nage);
+[age_bestest_regsim_max]=reg_simplify(age_bestest_reg_max,nage);
+[age_bestest_luh_regsim]=reg_simplify(age_bestest_luh_reg,nage);
+[age_bestest_luh_regsim_min]=reg_simplify(age_bestest_luh_reg_min,nage);
+[age_bestest_luh_regsim_max]=reg_simplify(age_bestest_luh_reg_max,nage);
+[gfad_fage_regsim]=reg_simplify(gfad_fage_reg,nage);
+[gfad_regsim_min]=reg_simplify(gfad_reg_min,nage);
+[gfad_regsim_max]=reg_simplify(gfad_reg_max,nage);
 
 figure
 cc=0;
-%for rr=[8 10 9 7 5 6 14 13 15 2 3 4 12 11]
-for rr=[2 3 4 12 11]
+for rr=1:nregionsim
     cc=cc+1;
     ss(rr)=subplot(2,4,cc);
-    [p1 h1 h2]=plotyy(ages(1:14),age_bestest_luh_reg(rr,1:14),ages(15),age_bestest_luh_reg(rr,15));
+    [p1 h1 h2]=plotyy(ages(1:14),age_bestest_luh_regsim(rr,1:14),ages(15),age_bestest_luh_regsim(rr,15));
     hold(p1(1)); hold(p1(2));
     set(h1,'marker','.','markersize',10,'color','k')
     set(h2,'marker','.','markersize',15,'color','k','linestyle','none')
     % Other years for baseline simulation
-    plot(p1(2),ages(15),age_bestest_luh_reg_max(rr,15),'k.','markersize',5,'marker','v')
-    plot(p1(2),ages(15),age_bestest_luh_reg_min(rr,15),'k.','markersize',5,'marker','^')
+    plot(p1(2),ages(15),age_bestest_luh_regsim_max(rr,15),'k.','markersize',5,'marker','v')
+    plot(p1(2),ages(15),age_bestest_luh_regsim_min(rr,15),'k.','markersize',5,'marker','^')
     % Shaded area for the sensitivity studies
-    poly1_y=[age_bestest_luh_reg_max(rr,1:14),fliplr(age_bestest_luh_reg_min(rr,1:14))];
+    poly1_y=[age_bestest_luh_regsim_max(rr,1:14),fliplr(age_bestest_luh_regsim_min(rr,1:14))];
     poly1_x=[ages(1:14),fliplr(ages(1:14))];
     pp1=patch(p1(1),poly1_x,poly1_y,[0.5 0.5 0.5]);
     set(pp1,'FaceAlpha',0.3,'LineStyle','none')
 
-    h3=plot(p1(1),ages(1:14),age_bestest_reg(rr,1:14));
-    h4=plot(p1(2),ages(15),age_bestest_reg(rr,15));
-    plot(p1(2),ages(15),age_bestest_reg_max(rr,15),'b','markersize',5,'marker','v')
-    plot(p1(2),ages(15),age_bestest_reg_min(rr,15),'b','markersize',5,'marker','^')
+    h3=plot(p1(1),ages(1:14),age_bestest_regsim(rr,1:14));
+    h4=plot(p1(2),ages(15),age_bestest_regsim(rr,15));
+    plot(p1(2),ages(15),age_bestest_regsim_max(rr,15),'b','markersize',5,'marker','v')
+    plot(p1(2),ages(15),age_bestest_regsim_min(rr,15),'b','markersize',5,'marker','^')
     set(h3,'marker','.','markersize',10,'color','b')
     set(h4,'marker','.','markersize',15,'color','b','linestyle','none')
     set(p1(1),'ycolor','k'); set(p1(2),'ycolor','k');
-    poly2_y=[age_bestest_reg_max(rr,1:14),fliplr(age_bestest_reg_min(rr,1:14))];
+    poly2_y=[age_bestest_regsim_max(rr,1:14),fliplr(age_bestest_regsim_min(rr,1:14))];
     poly2_x=[ages(1:14),fliplr(ages(1:14))];
     pp2=patch(p1(1),poly2_x,poly2_y,[0 0 0.5]);
     set(pp2,'FaceAlpha',0.3,'LineStyle','none')
     
     if plotgfad
-        h5=plot(p1(1),ages(1:14),gfad_fage_reg(rr,1:14));
-        h6=plot(p1(2),ages(15),gfad_fage_reg(rr,15));
-        plot(p1(2),ages(15),gfad_reg_max(rr,15),'g','markersize',5,'marker','v')
-        plot(p1(2),ages(15),gfad_reg_min(15,rr),'g','markersize',5,'marker','^')
+        h5=plot(p1(1),ages(1:14),gfad_fage_regsim(rr,1:14));
+        h6=plot(p1(2),ages(15),gfad_fage_regsim(rr,15));
+        plot(p1(2),ages(15),gfad_regsim_max(rr,15),'g','markersize',5,'marker','v')
+        plot(p1(2),ages(15),gfad_regsim_min(rr,15),'g','markersize',5,'marker','^')
         set(h5,'marker','.','markersize',10,'color','g')
         set(h6,'marker','.','markersize',15,'color','g','linestyle','none')
         set(p1(1),'ycolor','k'); set(p1(2),'ycolor','k');
-        poly3_y=[gfad_reg_max(rr,1:14),fliplr(gfad_reg_min(rr,1:14))];
+        poly3_y=[gfad_regsim_max(rr,1:14),fliplr(gfad_regsim_min(rr,1:14))];
         poly3_x=[ages(1:14),fliplr(ages(1:14))];
         pp3=patch(p1(1),poly3_x,poly3_y,[0 0.5 0]);
         set(pp3,'FaceAlpha',0.3,'LineStyle','none')
@@ -281,7 +292,7 @@ for rr=[2 3 4 12 11]
         %ylabel(p1(2),'OG forest area (M km^{-2})')
         set(get(p1(2),'Ylabel'),'Rotation',270,'VerticalAlignment','bottom')
     end
-    title(regions{rr})
+    title(regions_sim{rr})
 end
 clear rr cc
 
