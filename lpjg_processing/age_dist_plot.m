@@ -28,6 +28,7 @@ lpjg_dir_highest_luh='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
+ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask file
 
 gfad_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1.nc';
 gfad_upper_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1_upperbound.nc';
@@ -229,11 +230,23 @@ clear rr cc
 [gfad_regsim_min]=reg_simplify(gfad_reg_min,nage);
 [gfad_regsim_max]=reg_simplify(gfad_reg_max,nage);
 
+rmasksim=NaN(size(rmask));
+rmasksim(rmask==10 | rmask==9)=1;
+rmasksim(rmask==7)=2;
+rmasksim(rmask==5)=3;
+rmasksim(rmask==6)=4;
+rmasksim(rmask==14 | rmask==13)=5;
+rmasksim(rmask==2)=6;
+rmasksim(rmask==3 | rmask==4)=7;
+rmasksim(rmask==11 | rmask==12 | rmask==15)=8;
+
+panelletters={'(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)'};
+
 figure
 cc=0;
 for rr=1:nregionsim
     cc=cc+1;
-    ss(rr)=subplot(2,4,cc);
+    ss(rr)=subplot(3,4,cc);
     [p1 h1 h2]=plotyy(ages(1:14),age_bestest_luh_regsim(rr,1:14),ages(15),age_bestest_luh_regsim(rr,15));
     hold(p1(1)); hold(p1(2));
     set(h1,'marker','.','markersize',10,'color','k')
@@ -279,21 +292,62 @@ for rr=1:nregionsim
         set(p1(1),'XTick',10:10:150,'XTickLabel',{'1-10','11-20','21-30','31-40','41-50','51-60',...
             '61-70','71-80','81-90','91-100','101-110','111-120','121-130','131-140','OG'})
         set(p1(1),'XTickLabelRotation',300)
-        xlabel('Age class (years)')
+        xlabel('Age class (years)','FontWeight','bold')
     else
         set(p1(1),'XTick',10:10:150,'XTickLabel','')
     end
     if cc==1 || cc==5 || cc==9 || cc==13
-        ylabel(p1(1),'Young forest area (M km^{-2})')
+        ylabel(p1(1),'Young forest area (M km^{-2})','FontWeight','bold')
         %ylabel(p1(1),'Young forest area (M km^{-2})')
     end
     if cc==4 || cc==8 || cc==12 || cc==16
-        ylabel(p1(2),'OG forest area (M km^{-2})')
+        ylabel(p1(2),'OG forest area (M km^{-2})','FontWeight','bold')
         %ylabel(p1(2),'OG forest area (M km^{-2})')
         set(get(p1(2),'Ylabel'),'Rotation',270,'VerticalAlignment','bottom')
     end
-    title(regions_sim{rr})
+    title([panelletters{rr},' ',regions_sim{rr}])
 end
 clear rr cc
 
+ss(9)=subplot(3,4,9);
 
+%Merge forest mask and region arrays
+regmask=rmasksim;
+regmask(fmask<0.05)=NaN;
+regmask(isnan(fmask))=NaN;
+
+%Read mask for ocean areas
+load(ocean_file);
+oceanm=NaN(720,360);
+oceanm(esa_05'>200 & esa_05'<220)=-1;
+oceanm=oceanm';
+
+lons=-180:0.5:179.5;
+lats=-90:0.5:89.5;
+
+cmapbiome=cbrewer('qual','Paired',8);
+cmap=[0.9 0.9 0.9; cmapbiome];
+
+colormap(cmap)
+axesm('MapProjection','robinson','MapLatLimit',[23 80])
+hold on
+l1=pcolorm(lats,lons,oceanm);
+set(l1,'linestyle','none')
+p1=pcolorm(lats,lons,regmask);
+set(p1,'linestyle','none')
+axis tight
+caxis([0 8])
+c1=colorbar;
+set(c1,'FontSize',12,'FontWeight','Bold')
+set(c1,'Ticks',1.4:0.87:8,'TickLabels',regions_sim)
+set(c1,'Limits',[1 8]) %Remove labels for New Zealand and Rest of World
+
+set(ss(1),'Position',[0.05 0.70 0.18 0.25])
+set(ss(2),'Position',[0.29 0.70 0.18 0.25])
+set(ss(3),'Position',[0.53 0.70 0.18 0.25])
+set(ss(4),'Position',[0.77 0.70 0.18 0.25])
+set(ss(5),'Position',[0.05 0.40 0.18 0.25])
+set(ss(6),'Position',[0.29 0.40 0.18 0.25])
+set(ss(7),'Position',[0.53 0.40 0.18 0.25])
+set(ss(8),'Position',[0.77 0.40 0.18 0.25])
+set(ss(9),'Position',[0.17 0.07 0.6 0.2])
