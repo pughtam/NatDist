@@ -14,6 +14,7 @@ use_fmask=true; %Mask by current forest area
 ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
+plotgfad=true; %Whether to also plot the GFAD data
 
 fname='ageclass_2014';
 lpjg_dir_bestest='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000/';
@@ -27,7 +28,10 @@ lpjg_dir_highest_luh='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
-regmaskfile_gfad='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1.nc';
+
+gfad_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1.nc';
+gfad_upper_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1_upperbound.nc';
+gfad_lower_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1_lowerbound.nc';
 
 %---
 % Read in LPJG age distributions
@@ -77,9 +81,7 @@ end
 
 % Aggregate to regional age class distributions based on forest cover
 
-onedeg=false;
-[rmask,regions,regions_short]=gfad_regions(regmaskfile_gfad,onedeg);
-clear onedeg
+[rmask,regions,regions_short]=gfad_regions(gfad_file,false);
 nregion=length(regions);
 rmask=flipud(rmask');
 
@@ -106,16 +108,28 @@ for cc=1:nage
     age_lowest_luh_area_temp=squeeze(age_lowest_luh_area(:,:,cc));
     age_highest_luh_area_temp=squeeze(age_highest_luh_area(:,:,cc));
     for nn=1:nregion
-        age_bestest_reg(nn,cc)=nansum(age_bestest_area_temp(rmask==nn));
-        age_lowest_reg(nn,cc)=nansum(age_lowest_area_temp(rmask==nn));
-        age_highest_reg(nn,cc)=nansum(age_highest_area_temp(rmask==nn));
-        age_bestest_luh_reg(nn,cc)=nansum(age_bestest_luh_area_temp(rmask==nn));
-        age_lowest_luh_reg(nn,cc)=nansum(age_lowest_luh_area_temp(rmask==nn));
-        age_highest_luh_reg(nn,cc)=nansum(age_highest_luh_area_temp(rmask==nn));
+        age_bestest_reg(nn,cc)=nansum(age_bestest_area_temp(rmask==nn))/1e12; %Million km2
+        age_lowest_reg(nn,cc)=nansum(age_lowest_area_temp(rmask==nn))/1e12;
+        age_highest_reg(nn,cc)=nansum(age_highest_area_temp(rmask==nn))/1e12;
+        age_bestest_luh_reg(nn,cc)=nansum(age_bestest_luh_area_temp(rmask==nn))/1e12;
+        age_lowest_luh_reg(nn,cc)=nansum(age_lowest_luh_area_temp(rmask==nn))/1e12;
+        age_highest_luh_reg(nn,cc)=nansum(age_highest_luh_area_temp(rmask==nn))/1e12;
     end
 end
 clear nn cc age_bestest_area_temp age_lowest_area_temp age_highest_area_temp
 
+%---
+% Optionally read the GFAD data
+
+if plotgfad
+    [gfad_fage_reg,gfad_upper_fage_reg,gfad_lower_fage_reg]=gfad_breakdown_region(...
+        gfad_file,gfad_lower_file,gfad_upper_file,...
+        use_cvegmask,use_bmask,use_fmask,...
+        cvegmask,bmask,ffrac,rmask,nregion);
+end
+
+
+%---
 % Bearing in mind that best estimate does not always fit within the maximum and minimum values, find upper and lower bounds
 % of the overall ranges
 age_bestest_reg_min=min(cat(3,age_bestest_reg,age_lowest_reg,age_highest_reg),[],3);
@@ -124,12 +138,15 @@ age_bestest_reg_max=max(cat(3,age_bestest_reg,age_lowest_reg,age_highest_reg),[]
 age_bestest_luh_reg_min=min(cat(3,age_bestest_luh_reg,age_lowest_luh_reg,age_highest_luh_reg),[],3);
 age_bestest_luh_reg_max=max(cat(3,age_bestest_luh_reg,age_lowest_luh_reg,age_highest_luh_reg),[],3);
 
+if plotgfad
+    gfad_reg_min=min(cat(3,gfad_fage_reg,gfad_lower_fage_reg,gfad_upper_fage_reg),[],3);
+    gfad_reg_max=max(cat(3,gfad_fage_reg,gfad_lower_fage_reg,gfad_upper_fage_reg),[],3);
+end
+
+%---
 % Make age class plots
 
-
 ages=5:10:150;
-
-%ind1=find(dist_year==2015);
 
 figure
 cc=0;
@@ -161,19 +178,20 @@ for rr=[10 9 7 5 6 14 13 15]
     poly2_x=[ages(1:14),fliplr(ages(1:14))];
     pp2=patch(p1(1),poly2_x,poly2_y,[0 0 0.5]);
     set(pp2,'FaceAlpha',0.3,'LineStyle','none')
-% 
-%     h5=plot(p1(1),ages(1:14),gfadplot(1:14,rr));
-%     h6=plot(p1(2),ages(15),gfadplot(15,rr));
-%     plot(p1(2),ages(15),gfadplot_upperrange(15,rr),'g','markersize',5,'marker','v')
-%     plot(p1(2),ages(15),gfadplot_lowerrange(15,rr),'g','markersize',5,'marker','^')
-%     set(h5,'marker','.','markersize',10,'color','g')
-%     set(h6,'marker','.','markersize',15,'color','g','linestyle','none')
-%     set(p1(1),'ycolor','k'); set(p1(2),'ycolor','k');
-%     poly3_y=[gfadplot_upperrange(1:14,rr)',fliplr(gfadplot_lowerrange(1:14,rr)')];
-%     poly3_x=[ages(1:14),fliplr(ages(1:14))];
-%     pp3=patch(p1(1),poly3_x,poly3_y,[0 0.5 0]);
-%     set(pp3,'FaceAlpha',0.3,'LineStyle','none')
-    
+
+    if plotgfad
+        h5=plot(p1(1),ages(1:14),gfad_fage_reg(rr,1:14));
+        h6=plot(p1(2),ages(15),gfad_fage_reg(rr,15));
+        plot(p1(2),ages(15),gfad_reg_max(rr,15),'g','markersize',5,'marker','v')
+        plot(p1(2),ages(15),gfad_reg_min(15,rr),'g','markersize',5,'marker','^')
+        set(h5,'marker','.','markersize',10,'color','g')
+        set(h6,'marker','.','markersize',15,'color','g','linestyle','none')
+        set(p1(1),'ycolor','k'); set(p1(2),'ycolor','k');
+        poly3_y=[gfad_reg_max(rr,1:14),fliplr(gfad_reg_min(rr,1:14))];
+        poly3_x=[ages(1:14),fliplr(ages(1:14))];
+        pp3=patch(p1(1),poly3_x,poly3_y,[0 0.5 0]);
+        set(pp3,'FaceAlpha',0.3,'LineStyle','none')
+    end
     
     set(p1(1),'XLim',[0 155],'YLim',[0 Inf],'Box','off', 'YTickMode', 'auto', 'YTickLabelMode', 'auto')
     set(p1(2),'XLim',[0 155],'YLim',[0 Inf], 'YTickMode', 'auto', 'YTickLabelMode', 'auto')
@@ -186,11 +204,11 @@ for rr=[10 9 7 5 6 14 13 15]
         set(p1(1),'XTick',10:10:150,'XTickLabel','')
     end
     if cc==1 || cc==5 || cc==9 || cc==13
-        ylabel(p1(1),'CC young forest area (M km^{-2})')
+        ylabel(p1(1),'Young forest area (M km^{-2})')
         %ylabel(p1(1),'Young forest area (M km^{-2})')
     end
     if cc==4 || cc==8 || cc==12 || cc==16
-        ylabel(p1(2),'CC OG forest area (M km^{-2})')
+        ylabel(p1(2),'OG forest area (M km^{-2})')
         %ylabel(p1(2),'OG forest area (M km^{-2})')
         set(get(p1(2),'Ylabel'),'Rotation',270,'VerticalAlignment','bottom')
     end
@@ -202,7 +220,7 @@ clear rr cc
 figure
 cc=0;
 %for rr=[8 10 9 7 5 6 14 13 15 2 3 4 12 11]
-for rr=[2 3 4 12 11 17 18 19]
+for rr=[2 3 4 12 11]
     cc=cc+1;
     ss(rr)=subplot(2,4,cc);
     [p1 h1 h2]=plotyy(ages(1:14),age_bestest_luh_reg(rr,1:14),ages(15),age_bestest_luh_reg(rr,15));
@@ -229,19 +247,20 @@ for rr=[2 3 4 12 11 17 18 19]
     poly2_x=[ages(1:14),fliplr(ages(1:14))];
     pp2=patch(p1(1),poly2_x,poly2_y,[0 0 0.5]);
     set(pp2,'FaceAlpha',0.3,'LineStyle','none')
-% 
-%     h5=plot(p1(1),ages(1:14),gfadplot(1:14,rr));
-%     h6=plot(p1(2),ages(15),gfadplot(15,rr));
-%     plot(p1(2),ages(15),gfadplot_upperrange(15,rr),'g','markersize',5,'marker','v')
-%     plot(p1(2),ages(15),gfadplot_lowerrange(15,rr),'g','markersize',5,'marker','^')
-%     set(h5,'marker','.','markersize',10,'color','g')
-%     set(h6,'marker','.','markersize',15,'color','g','linestyle','none')
-%     set(p1(1),'ycolor','k'); set(p1(2),'ycolor','k');
-%     poly3_y=[gfadplot_upperrange(1:14,rr)',fliplr(gfadplot_lowerrange(1:14,rr)')];
-%     poly3_x=[ages(1:14),fliplr(ages(1:14))];
-%     pp3=patch(p1(1),poly3_x,poly3_y,[0 0.5 0]);
-%     set(pp3,'FaceAlpha',0.3,'LineStyle','none')
     
+    if plotgfad
+        h5=plot(p1(1),ages(1:14),gfad_fage_reg(rr,1:14));
+        h6=plot(p1(2),ages(15),gfad_fage_reg(rr,15));
+        plot(p1(2),ages(15),gfad_reg_max(rr,15),'g','markersize',5,'marker','v')
+        plot(p1(2),ages(15),gfad_reg_min(15,rr),'g','markersize',5,'marker','^')
+        set(h5,'marker','.','markersize',10,'color','g')
+        set(h6,'marker','.','markersize',15,'color','g','linestyle','none')
+        set(p1(1),'ycolor','k'); set(p1(2),'ycolor','k');
+        poly3_y=[gfad_reg_max(rr,1:14),fliplr(gfad_reg_min(rr,1:14))];
+        poly3_x=[ages(1:14),fliplr(ages(1:14))];
+        pp3=patch(p1(1),poly3_x,poly3_y,[0 0.5 0]);
+        set(pp3,'FaceAlpha',0.3,'LineStyle','none')
+    end
     
     set(p1(1),'XLim',[0 155],'YLim',[0 Inf],'Box','off', 'YTickMode', 'auto', 'YTickLabelMode', 'auto')
     set(p1(2),'XLim',[0 155],'YLim',[0 Inf], 'YTickMode', 'auto', 'YTickLabelMode', 'auto')
@@ -254,11 +273,11 @@ for rr=[2 3 4 12 11 17 18 19]
         set(p1(1),'XTick',10:10:150,'XTickLabel','')
     end
     if cc==1 || cc==5 || cc==9 || cc==13
-        ylabel(p1(1),'CC young forest area (M km^{-2})')
+        ylabel(p1(1),'Young forest area (M km^{-2})')
         %ylabel(p1(1),'Young forest area (M km^{-2})')
     end
     if cc==4 || cc==8 || cc==12 || cc==16
-        ylabel(p1(2),'CC OG forest area (M km^{-2})')
+        ylabel(p1(2),'OG forest area (M km^{-2})')
         %ylabel(p1(2),'OG forest area (M km^{-2})')
         set(get(p1(2),'Ylabel'),'Rotation',270,'VerticalAlignment','bottom')
     end
