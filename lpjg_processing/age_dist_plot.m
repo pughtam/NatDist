@@ -50,6 +50,12 @@ age_bestest_luh=squeeze(lpj_to_grid_func_centre([lpjg_dir_bestest_luh,'/',fname]
 age_lowest_luh=squeeze(lpj_to_grid_func_centre([lpjg_dir_lowest_luh,'/',fname],1,0)); %Lower bound
 age_highest_luh=squeeze(lpj_to_grid_func_centre([lpjg_dir_highest_luh ,'/',fname],1,0)); %Upper bound
 
+%Correct LUH2 simulations to assume that the whole grid-cell area is forest (because they will later be scaled by observed
+%forest fraction)
+age_bestest_luh=age_bestest_luh./repmat(sum(age_bestest_luh,3),[1 1 nage]);
+age_lowest_luh=age_lowest_luh./repmat(sum(age_lowest_luh,3),[1 1 nage]);
+age_highest_luh=age_highest_luh./repmat(sum(age_highest_luh,3),[1 1 nage]);
+
 % Mask arrays
 [cvegmask,fmask,bmask,ffrac]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir_bestest,fmask_dir,fmask_file,bmask_dir);
 
@@ -118,6 +124,7 @@ for cc=1:nage
     end
 end
 clear nn cc age_bestest_area_temp age_lowest_area_temp age_highest_area_temp
+clear age_bestest_luh_area_temp age_lowest_luh_area_temp age_highest_luh_area_temp
 
 %---
 % Optionally read the GFAD data
@@ -351,3 +358,38 @@ set(ss(6),'Position',[0.29 0.40 0.18 0.25])
 set(ss(7),'Position',[0.53 0.40 0.18 0.25])
 set(ss(8),'Position',[0.77 0.40 0.18 0.25])
 set(ss(9),'Position',[0.17 0.07 0.6 0.2])
+
+%---
+% Calculate some totals
+
+% All temperate forest old-growth
+sum(age_bestest_regsim([2,3,4,5,8],15)) %Natural
+sum(age_bestest_luh_regsim([2,3,4,5,8],15)) %LUH2
+
+%---
+%Map the reductions in old-growth
+figure
+%Read mask for ocean areas
+load(ocean_file);
+oceanm=NaN(720,360);
+oceanm(esa_05'>200 & esa_05'<220)=-200;
+oceanm=oceanm';
+
+lons=-180:0.5:179.5;
+lats=-90:0.5:89.5;
+
+cmap=flipud(colormap(redblue(200)));
+cmap=[repmat([0.9 0.9 0.9],[100 1]); cmap];
+
+colormap(cmap)
+axesm('MapProjection','robinson','MapLatLimit',[23 80])
+hold on
+l1=pcolorm(lats,lons,oceanm);
+set(l1,'linestyle','none')
+p1=pcolorm(lats,lons,-(1-(age_bestest_luh(:,:,15)./age_bestest(:,:,15)))*100);
+set(p1,'linestyle','none')
+axis tight
+caxis([-200 100])
+c1=colorbar;
+set(c1,'FontSize',12,'FontWeight','Bold')
+set(c1,'Limits',[-100 100])
