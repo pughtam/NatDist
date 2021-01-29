@@ -14,7 +14,10 @@ use_fmask=true; %Mask by current forest area
 ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
-plotgfad=true; %Whether to also plot the GFAD data
+plotgfad=false; %Whether to also plot the GFAD data
+
+outputcsv=true; %Whether to output a csv file for recreating the plots elsewhere
+csvname_stub='age_dist_adjparam_latosa4000';
 
 fname='ageclass_2014';
 lpjg_dir_bestest='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000/';
@@ -233,9 +236,11 @@ clear rr cc
 [age_bestest_luh_regsim]=reg_simplify(age_bestest_luh_reg,nage);
 [age_bestest_luh_regsim_min]=reg_simplify(age_bestest_luh_reg_min,nage);
 [age_bestest_luh_regsim_max]=reg_simplify(age_bestest_luh_reg_max,nage);
-[gfad_fage_regsim]=reg_simplify(gfad_fage_reg,nage);
-[gfad_regsim_min]=reg_simplify(gfad_reg_min,nage);
-[gfad_regsim_max]=reg_simplify(gfad_reg_max,nage);
+if plotgfad
+    [gfad_fage_regsim]=reg_simplify(gfad_fage_reg,nage);
+    [gfad_regsim_min]=reg_simplify(gfad_reg_min,nage);
+    [gfad_regsim_max]=reg_simplify(gfad_reg_max,nage);
+end
 
 rmasksim=NaN(size(rmask));
 rmasksim(rmask==10 | rmask==9)=1;
@@ -393,3 +398,54 @@ caxis([-200 100])
 c1=colorbar;
 set(c1,'FontSize',12,'FontWeight','Bold')
 set(c1,'Limits',[-100 100])
+
+
+%--- Output csv file with global outputs for each simulation ---
+
+if outputcsv
+    % Output csv files with regional outputs for each simulation
+    for rr=1:nregionsim
+        fid=fopen([csvname_stub,'_region_',regions_sim{rr},'.csv'],'w');
+        if ccmask
+            fprintf(fid,'Units: million km2 closed-canopy area\n');
+        else
+            fprintf(fid,'Units: million km2 canopy area\n');
+        end
+        
+        fprintf(fid,'Simulation,1-10,11-20,21-30,31-40,41-50,51-60,61-70,71-80,81-90,91-100,101-110,111-120,121-130,131-140,OG\n');
+        fprintf(fid,'Nat. Mean, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n',...
+            age_bestest_regsim(rr,:));
+        fprintf(fid,'Nat. Min., %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n',...
+            age_bestest_regsim_min(rr,:));
+        fprintf(fid,'Nat. Max., %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n',...
+            age_bestest_regsim_max(rr,:));
+        fprintf(fid,'LUH2 Mean, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n',...
+            age_bestest_luh_regsim(rr,:));
+        fprintf(fid,'LUH2 Min., %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n',...
+            age_bestest_luh_regsim_min(rr,:));
+        fprintf(fid,'LUH2 Max., %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n',...
+            age_bestest_luh_regsim_max(rr,:));
+        fclose(fid);
+    end
+    
+    % Output the regional map data to text file
+    regmask_out=regmask;
+    regmask_out(isnan(regmask))=-9999;
+    regmask_out=int32(regmask_out);
+    
+    fid=fopen('gfad_region_map.txt','w');
+    
+    for yy=360:-1:1
+        fprintf(fid,repmat('%7d',1,720),regmask_out(yy,:));
+        fprintf(fid,'\n');
+    end
+    clear yy
+    fclose(fid);
+    
+    fid=fopen('gfad_region_legend.txt','w');
+    for nn=1:nregionsim
+        fprintf(fid,'%d %s\n',nn,regions_sim{nn});
+    end
+    clear nn
+    fclose(fid);
+end
