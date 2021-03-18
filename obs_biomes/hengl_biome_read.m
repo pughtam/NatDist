@@ -31,14 +31,14 @@ function [biomes_0p5,biomenames]=hengl_biome_read(simplebiomes)
 % T. Pugh
 % 05.07.20
 
-%Note: edits needed to geotiffinfo.m to read this multilayer file. See https://cosmojiang.wordpress.com/2018/04/02/matlab-geotiffread-for-multiple-layers/
+% Note: edits needed to geotiffinfo.m to read this multilayer file. See https://cosmojiang.wordpress.com/2018/04/02/matlab-geotiffread-for-multiple-layers/
 [biomes,cmap,refmat,bbox]=geotiffread('/Users/pughtam/data/hengl_biomes/pnv_biome.type_biome00k_c_1km_s0..0cm_2000..2017_v0.1.tif');
 biomes=flipud(biomes);
 
 ndims=size(biomes);
 cellsize=360/ndims(2);
 
-%Optionally create simplified classification for comparison with LPJ-GUESS
+% Optionally create simplified classification for comparison with LPJ-GUESS
 if simplebiomes
     biomes_sim=biomes;
     %Numbers of 1-3 unchanged
@@ -70,7 +70,7 @@ else
         'erect dwarf shrub tundra','low and high shrub tundra','prostrate dwarf shrub tundra'};
 end
 
-%Aggregate to 0.5 degrees
+% Aggregate to 0.5 degrees
 ncells=0.5/cellsize;
 biomes_0p5=NaN(360,720);
 for xx=1:720

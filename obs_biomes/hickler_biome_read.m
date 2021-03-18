@@ -1,5 +1,16 @@
 function [out_map,names]=hickler_biome_read(biome_scheme)
+% Read in the Haxeltine and Prentice (1996, Global Biogeochemical Cycles 10, 693-709) biomes as published in Hickler et al. (2006, Global Ecology and Biogeography 15, 567-577).
+% Optionally aggregate to match Hengl et al. (2018, PeerJ 2018(8), 1-36) biomes.
+%
+% Input:
+% - biome_scheme=1, Hickler et al. original scheme
+% - biome_scheme=2, Hengl et al. scheme
+%
+% Dependencies:
+% - vegmap18.out, text file with biome codes by grid cell
+% T. Pugh
 
+% Key for biome codes
 % 1 Boreal deciduous forest/woodland
 % 2 Boreal evergreen forest/woodland
 % 3 Temperate/boreal mixed forest
