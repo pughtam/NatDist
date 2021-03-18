@@ -40,12 +40,13 @@ for xx=1:720
             outarray(cc,3)=broad(yy,xx);
             outarray(cc,4)=needle(yy,xx);
             outarray(cc,5)=mixed(yy,xx);
+            outarray(cc,6)=0; %Need to include a NATURAL stand
         end
     end
 end
 clear xx yy
 
-outtable=array2table(outarray,'VariableNames',{'Lon','Lat','Broadl','Needle','Mixed'});
+outtable=array2table(outarray,'VariableNames',{'Lon','Lat','Broadl','Needle','Mixed','Natural'});
         
 % Write to text file
 writetable(outtable,'lpjg_foresttype_input.txt','Delimiter',' ')
