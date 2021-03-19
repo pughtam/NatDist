@@ -1,3 +1,7 @@
+# Code for producing Figure 3
+#
+# C. Senf
+# 01.02.2021
 
 # Libraries and functions -------------------------------------------------
 
