@@ -1,3 +1,7 @@
+# Map disturbance acitivity clusters to traits/climte using a multi-modal model
+#
+# C. Senf
+# 29.01.2021
 
 # Libraries ---------------------------------------------------------------
 
