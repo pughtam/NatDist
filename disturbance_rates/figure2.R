@@ -1,3 +1,7 @@
+# Code for producing Figure 2 based on LPJ-Output
+#
+# C. Senf
+# 01.02.2021
 
 # Libraries and functions -------------------------------------------------
 
@@ -16,7 +20,6 @@ world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 
 modeldat <- read_csv("data/modeldat.csv")
 site_locations <- read_csv("data/studysites_combined.csv")
-#site_shp <- read_sf("../Boreal Forests/data/studysites/studysites_combined_centers.shp")
 
 # Read LPJ-Output ---------------------------------------------------------
 
