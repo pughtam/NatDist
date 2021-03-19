@@ -1,3 +1,7 @@
+# Preparing Hansen disturbance data for non-spatial analysis, i.e., aggregating disturbance/forest pixels per year/landscape
+#
+# C. Senf
+# 09.09.2019
 
 # Packages ----------------------------------------------------------------
 
