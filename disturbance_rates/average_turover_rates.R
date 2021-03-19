@@ -1,3 +1,7 @@
+# Calibrate disturbance rate model for all forests
+#
+# C. Senf
+# 19.02.2021
 
 library(tidyverse)
 library(raster)
