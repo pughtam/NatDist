@@ -1,3 +1,6 @@
+# Aggregate forest cover and disturbances from Hansen to definition of open/closed-canopy forests used by Pugh et al. 2019 Nature Geosciences
+#
+# C. Senf
 
 library(tidyverse)
 library(raster)
