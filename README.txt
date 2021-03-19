@@ -10,13 +10,13 @@ Scripts underlying analysis in:
 Thomas A. M. Pugh, Rupert Seidl, Daijun Liu, Mats Lindeskog, Cornelius Senf, The anthropogenic imprint on temperate and boreal forest demography and carbon turnover.
 
 Folder: disturbance_rates
-- aggregate_hansen_forestcover.R
-- prepare_hansen_disturbance_data.R
-- average_turover_rates_closedforest.R
-- average_turover_rates_openforest.R
-- cluster_assignment.R
-- figure2.R
-- figure3.R
+- aggregate_hansen_forestcover.R, aggregate forest cover and disturbances from Hansen to definition of open/closed-canopy forests used by Pugh et al. 2019 Nature Geosciences
+- prepare_hansen_disturbance_data.R, preparing Hansen disturbance data for non-spatial analysis, i.e., aggregating disturbance/forest pixels per year/landscape
+- average_turover_rates.R, calibrate disturbance rate model for all forests
+- average_turover_rates_closedforest.R, calibrate disturbance rate model for closed canopy forests
+- cluster_assignment.R, map disturbance acitivity clusters to traits/climte using a multi-modal model
+- figure2.R, code for producing Figure 2
+- figure3.R, code for producing Figure 3
 
 Folder: ESA_processing
 - esa_broadleaf_frac_0p5deg.m, classify ESA landcover into broadleaf and needleleaf classes
