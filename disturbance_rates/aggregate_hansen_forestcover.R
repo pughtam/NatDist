@@ -1,6 +1,7 @@
 # Aggregate forest cover and disturbances from Hansen to definition of open/closed-canopy forests used by Pugh et al. 2019 Nature Geosciences
 #
 # C. Senf
+# 03.12.2019
 
 # Libraries ---------------------------------------------------------------
 
