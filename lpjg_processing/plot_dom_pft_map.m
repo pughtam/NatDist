@@ -3,6 +3,7 @@
 % Dependencies:
 % - readmasks_func.m
 % - cbrewer (https://uk.mathworks.com/matlabcentral/fileexchange/34087-cbrewer-colorbrewer-schemes-for-matlab)
+% - hickler_biome_read.m
 %
 %T. Pugh
 %22.01.20
@@ -12,21 +13,30 @@ use_fmask=true; %Mask by current forest area
 ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
-writetxt=true; %Write out to text file
+writetxt=false; %Write out to text file
+
+obsbiome=true; %Whether to also plot observation-based biomes
 
 outfile_name='simplemodel_best_est_100patch_10pCanopyCover_biomes_v2.txt';
 
-lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est_100patch';
+%lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est_100patch';
+%lpjg_dir='/Users/pughtam/LPJG/bugfix_lu_progdist_ageout_runs/best_est';
+%lpjg_dir='/Users/pughtam/LPJG/bugfix_lu_progdist_ageout_runs/best_est_luh2';
+%lpjg_dir='/Users/pughtam/LPJG/bugfix_lu_progdist_ageout_runs/best_est_adjparam';
+lpjg_dir='/Users/pughtam/LPJG/bugfix_lu_progdist_ageout_runs/best_est_adjparam_latosa4000';
+%lpjg_dir='/Users/pughtam/LPJG/trunk_r8640_benchmark';
+%lpjg_dir='/Users/pughtam/LPJG/trunk_r8278_aitkinresp/Output_global';
 %lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/100_flat_orig_r5511/postproc/';
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
 ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask file
 
+addpath('/Users/pughtam/data/Hickler_vegmap')
 
 %--- Read in data ---
 
-lai=squeeze(lpj_to_grid_func_centre([lpjg_dir,'/lai_2001_2014'],1,0));
+lai=squeeze(lpj_to_grid_func_centre([lpjg_dir,'/lai_1961_1990'],1,0));
 lai(:,:,13)=[]; %Remove total column
 
 [cvegmask,fmask,bmask]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir);
@@ -78,43 +88,47 @@ biomenames={'Boreal decid forest','Boreal ever forest','Temp/boreal mix fo.','Te
     'Moist savannas','Dry savannas','Tall grassland','Dry grassland','Xeric wood/shrub','Arid shrub/steppe',...
     'Desert','Arctic/alpine tundra'};
 
+pftnames={'BNE','BINE','BNS','TeNE','TeBS','IBS','TeBE','TrBE','TrIBE','TrBR','C3G','C4G'};
+
 %NOTE: Below differs from Smith et al. (2014) in that treelai>2, rather than >2.5.
+%treelaithres=2.0;
+treelaithres=2.5;
 biome=NaN(360,720);
 for xx=1:720
     for yy=1:360
-        if (treelai(yy,xx) > 2.0) && (trbelai(yy,xx) > (0.6*treelai(yy,xx)))
+        if (treelai(yy,xx) > treelaithres) && (trbelai(yy,xx) > (0.6*treelai(yy,xx)))
             biome(yy,xx)=9; %Trop rain forest
-        elseif (treelai(yy,xx) > 2.0 && (lai(yy,xx,8) > 0.6*treelai(yy,xx)))
+        elseif (treelai(yy,xx) > treelaithres && (lai(yy,xx,10) > 0.6*treelai(yy,xx)))
             biome(yy,xx)=10; %Trop decid forest
-        elseif (treelai(yy,xx) > 2.0 && (trlai(yy,xx) > 0.5*treelai(yy,xx)) && ...
+        elseif (treelai(yy,xx) > treelaithres && (trlai(yy,xx) > 0.5*treelai(yy,xx)) && ...
                 ((trbelai(yy,xx) > lai(yy,xx,7) && trbelai(yy,xx) > lai(yy,xx,5)) ||...
-                (lai(yy,xx,12) > lai(yy,xx,7) && lai(yy,xx,12) > lai(yy,xx,5))))
+                (lai(yy,xx,10) > lai(yy,xx,7) && lai(yy,xx,10) > lai(yy,xx,5))))
             biome(yy,xx)=8; %Trop season forest
-        elseif (treelai(yy,xx) > 2.0) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) &&...
+        elseif (treelai(yy,xx) > treelaithres) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) &&...
                 ((bneelai(yy,xx) > lai(yy,xx,3)) || (lai(yy,xx,6) > lai(yy,xx,3)))
             biome(yy,xx)=2; %Boreal ever forest
-        elseif (treelai(yy,xx) > 2.0) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) &&...
+        elseif (treelai(yy,xx) > treelaithres) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) &&...
                 (lai(yy,xx,3) > bneelai(yy,xx)) && (lai(yy,xx,3) > lai(yy,xx,6))
             biome(yy,xx)=1; %Boreal decid forest
-        elseif (treelai(yy,xx) > 2.0) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,7) > 0.5*treelai(yy,xx))
+        elseif (treelai(yy,xx) > treelaithres) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,7) > 0.5*treelai(yy,xx))
             biome(yy,xx)=6; %Temp broad ever fo.
-        elseif (treelai(yy,xx) > 2.0) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,5) > 0.5*treelai(yy,xx))
+        elseif (treelai(yy,xx) > treelaithres) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,5) > 0.5*treelai(yy,xx))
             biome(yy,xx)=5; %Temp decid forest
-        elseif (treelai(yy,xx) > 2.0) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,4) > 0.5*treelai(yy,xx))
+        elseif (treelai(yy,xx) > treelaithres) && (telai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,4) > 0.5*treelai(yy,xx))
             biome(yy,xx)=4; %Temp conifer forest
-        elseif (treelai(yy,xx) > 2.0) && (btlai(yy,xx) > 0.2*treelai(yy,xx))
+        elseif (treelai(yy,xx) > treelaithres) && (btlai(yy,xx) > 0.2*treelai(yy,xx))
             biome(yy,xx)=3; %Temp/boreal mix fo.
-        elseif (treelai(yy,xx) > 2.0)
+        elseif (treelai(yy,xx) > treelaithres)
             biome(yy,xx)=7; %Temp mixed forest
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) && (bneelai(yy,xx) > lai(yy,xx,3) || lai(yy,xx,6) > lai(yy,xx,3))
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < treelaithres) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) && (bneelai(yy,xx) > lai(yy,xx,3) || lai(yy,xx,6) > lai(yy,xx,3))
             biome(yy,xx)=2; %Boreal ever forest
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,3) > bneelai(yy,xx) && lai(yy,xx,3) > lai(yy,xx,6))
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < treelaithres) && (btlai(yy,xx) > 0.8*treelai(yy,xx)) && (lai(yy,xx,3) > bneelai(yy,xx) && lai(yy,xx,3) > lai(yy,xx,6))
             biome(yy,xx)=1; %Boreal decid forest
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0) && (treelai(yy,xx) > 0.8*totlai(yy,xx))
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < treelaithres) && (treelai(yy,xx) > 0.8*totlai(yy,xx))
             biome(yy,xx)=15; %Xeric wood/shrub
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0) && (totlai(yy,xx) > 2.0)
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < treelaithres) && (totlai(yy,xx) > 2.0)
             biome(yy,xx)=11; %Moist savannas
-        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < 2.0)
+        elseif (treelai(yy,xx) > 0.5) && (treelai(yy,xx) < treelaithres)
             biome(yy,xx)=12; %Dry savannas
         elseif (treelai(yy,xx) < 0.5) && (grasslai(yy,xx) > 0.2) && (lats(yy,xx) > 54)
             biome(yy,xx)=18; %Arctic/alpine tundra
@@ -132,19 +146,33 @@ for xx=1:720
     end
 end
 
+%Read the observation based biomes?
+if obsbiome
+    [hickler_biomes,hickler_biomenames]=hickler_biome_read(false);
+end
+
 if use_cvegmask
     dompft=dompft.*cvegmask;
     biome=biome.*cvegmask;
+    if obsbiome
+        hickler_biomes=hickler_biomes.*cvegmask;
+    end
 end
 
 if use_fmask
     dompft=dompft.*fmask;
     biome=biome.*fmask;
+    if obsbiome
+        hickler_biomes=hickler_biomes.*fmask;
+    end
 end
 
 if use_bmask
     dompft=dompft.*bmask;
     biome=biome.*bmask;
+    if obsbiome
+        hickler_biomes=hickler_biomes.*bmask;
+    end
 end
 
 
@@ -200,6 +228,9 @@ lons=-180:0.5:179.5;
 lats=-90:0.5:89.5;
 
 figure
+if obsbiome
+    subplot(2,1,1)
+end
 cmap=cbrewer('qual','Paired',19);
 cmap=[0.9 0.9 0.9; cmap];
 
@@ -218,6 +249,23 @@ set(c1,'FontSize',12,'FontWeight','Bold')
 set(c1,'Limits',[1 cmax])
 set(c1,'Ticks',1:18,'TickLabels',biomenames)
 
+if obsbiome
+    subplot(2,1,2)
+    
+    hold on
+    axesm('MapProjection','robinson','MapLatLimit',[23 80])
+    hold on
+    l1=pcolorm(lats,lons,oceanm);
+    set(l1,'linestyle','none')
+    p1=pcolorm(lats,lons,hickler_biomes);
+    set(p1,'linestyle','none')
+    axis tight
+    caxis([-1 18])
+    c1=colorbar;
+    set(c1,'FontSize',12,'FontWeight','Bold')
+    set(c1,'Limits',[1 cmax])
+    set(c1,'Ticks',1:18,'TickLabels',hickler_biomenames)
+end
 
 %--- Write out to text file ---
 
