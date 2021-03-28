@@ -1,10 +1,11 @@
 % Plot age distributions from the LPJ-GUESS simulations by GFAD regions.
 %
 % Dependencies:
-% - lpj_to_grid_func_centre
+% - lpj_to_grid_func_centre.m
 % - readmasks_func.m
 % - gfad_regions.m
 % - global_grid_func.m
+% - gfad_breakdown_region.m
 %
 % T. Pugh
 % 14.01.21
@@ -206,14 +207,14 @@ for rr=[10 9 7 5 6 14 13 15 2 3 4 12 11]
     
     set(p1(1),'XLim',[0 155],'YLim',[0 Inf],'Box','off', 'YTickMode', 'auto', 'YTickLabelMode', 'auto')
     set(p1(2),'XLim',[0 155],'YLim',[0 Inf], 'YTickMode', 'auto', 'YTickLabelMode', 'auto')
-    if cc>4
+    %if cc>9
         set(p1(1),'XTick',10:10:150,'XTickLabel',{'1-10','11-20','21-30','31-40','41-50','51-60',...
             '61-70','71-80','81-90','91-100','101-110','111-120','121-130','131-140','OG'})
         set(p1(1),'XTickLabelRotation',300)
         xlabel('Age class (years)')
-    else
-        set(p1(1),'XTick',10:10:150,'XTickLabel','')
-    end
+    %else
+    %    set(p1(1),'XTick',10:10:150,'XTickLabel','')
+    %end
     if cc==1 || cc==5 || cc==9 || cc==13
         ylabel(p1(1),'Young forest area (M km^{-2})')
         %ylabel(p1(1),'Young forest area (M km^{-2})')

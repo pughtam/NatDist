@@ -1,6 +1,5 @@
 function [new_region,regionnames,regionnames_short]=gfad_regions(gfad_filepath_stan,onedeg)
-%Script to take the GFAD regions and process them into something more
-%accessible
+%Script to take the GFAD regions and process them into something more accessible for plotting.
 %
 %T. Pugh
 %16.08.19
@@ -27,11 +26,11 @@ kazak=153;
 
 regionnames={'Rest of world','West Russia','Mid Russia','East Russia','North-East US',...
     'South-East US','West US','Alaska','East Canada','West Canada','South/Mid. China',...
-    'North China','South/Mid. Europe','North Europe','Japan and Korea','New Zealand'};
+    'North China','South/Mid. Europe','North Europe','Japan and Korea','New Zealand','Tropical SA','Tropical Af.','Tropical SEA'};
 
 regionnames_short={'RestOfWorld','WestRussia','MidRussia','EastRussia','NorthEastUS',...
     'SouthEastUS','WestUS','Alaska','EastCanada','WestCanada','SouthMidChina',...
-    'NorthChina','SouthMidEurope','NorthEurope','JapanKorea','NewZealand'};
+    'NorthChina','SouthMidEurope','NorthEurope','JapanKorea','NewZealand','TropSA','TropAf','TropSEA'};
 
 new_region=zeros(size(gfad_region));
 new_region(gfad_region==tropics)=1; %Rest of world

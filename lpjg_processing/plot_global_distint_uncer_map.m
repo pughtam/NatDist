@@ -21,12 +21,12 @@ limitscale=false; %Cap disturbance interval at 1000 years
 dimplot=1; %Column number in input file containing the disturbance rate
 
 makeplot=true; %Make a plot
-writetxt=true; %Write array to text file
+writetxt=false; %Write array to text file
 outfile_name='simplemodel_best_est_10pCanopyCover_uncerfrac.txt';
 
-lpjg_dir_base='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est';
-lpjg_dir_low='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_low_est';
-lpjg_dir_high='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_high_est';
+lpjg_dir_base='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000';
+lpjg_dir_low='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/low_2se_adjparam_latosa4000';
+lpjg_dir_high='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/high_2se_adjparam_latosa4000';
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
@@ -97,7 +97,7 @@ if makeplot
     lats=-90:0.5:89.5;
     
     figure
-    cmap=colormap(redblue(200));
+    cmap=colormap(parula(200));
     cmap=[0.9 0.9 0.9; cmap];
     
     colormap(cmap)

@@ -7,26 +7,35 @@
 %
 % Dependencies:
 % - readmasks_func.m
+% - lpj_to_grid_func_centre.m
 %
 % T. Pugh
 % 12.01.19
 
 use_cvegmask=true; %Mask by a minimum simulated vegetation biomass density
 use_fmask=true; %Mask by current forest area
-ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
+ccmask=true; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
 distvar=true; %Plot as disturbance return interval (true) or raw variable (false)
-logscale=true; %Plot map using log colour scale
-limitscale=false; %Cap colour scale at 1000 years
+logscale=false; %Plot map using log colour scale
+limitscale=true; %Cap colour scale at 1000 years
 dimplot=1; %Column number in input file containing the disturbance rate
 
-makeplot=true; %Make a plot
+makeplot=false; %Make a plot
+readnetcdf=true; %Read from a netcdf file, otherwise from an LPJ-GUESS output file
 writetxt=false; %Write array to text file
-writenetcdf=true; %Write array to netcdf file
-outfile_name='simplemodel_best_est_100patch_10pCanopyCover_nolimit';
+writenetcdf=false; %Write array to netcdf file
+output1deg=false; %Write netcdf at 1 x 1 degree aggregation, instead of 0.5 x 0.5
+%outfile_name='best_est_adjparam_latosa4000_closedcan_20patch_5pClosedCanopyCover_1deg';
+outfile_name='best_est_adjparam_latosa4000_20patch_10pCanopyCover';
+makeregionstats=true; %Make stats at regional level
 
-lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est_100patch';
+%lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000';
+lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000_closedcan';
+netcdf_file='/Users/pughtam/Documents/GAP_and_other_work/Disturbance/netcdfs_for_deposition/tauO/tauO_standard_forest-area_LUcorrected.nc';
+netcdf_varname='tauO';
+
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
@@ -36,10 +45,27 @@ ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask
 %--- Read in data ---
 
 % Read disturbance interval
-dist=squeeze(lpj_to_grid_func_centre([lpjg_dir,'/distprob_2001_2014'],1,0));
-dist(dist==0)=NaN;
+if readnetcdf
+    % Read disturbance interval from netcdf
+    distint_1deg=ncread(netcdf_file,netcdf_varname)';
+    % Resample to 0.5 degree
+    distint=NaN(360,720);
+    for xx=1:720
+        for yy=1:360
+            xx_s=ceil(xx/2);
+            yy_s=ceil(yy/2);
+            distint(yy,xx)=distint_1deg(yy_s,xx_s);
+        end
+    end
+    clear xx yy xx_s yy_s distint_1deg
+    dist=1./distint;
+    clear distint
+else
+    dist=squeeze(lpj_to_grid_func_centre([lpjg_dir,'/distprob_2001_2014'],1,0));
+    dist(dist==0)=NaN;
+end
 
-[cvegmask,fmask,bmask]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir);
+[cvegmask,fmask,bmask,ffrac]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir);
 
 
 %--- Data processing ---
@@ -81,9 +107,9 @@ else
     if distvar
         cmin=10;
         if limitscale
-            cmax=4000;
-        else
             cmax=1000;
+        else
+            cmax=4000;
         end
     else
         cmin=0;
@@ -130,6 +156,24 @@ if makeplot
     
 end
 
+%--- Aggregate to one degree for output? ---
+
+if output1deg
+    plotarray_1deg=NaN(180,360);
+    for xx=1:360
+        for yy=1:180
+            xx_s=(xx*2)-1;
+            xx_e=xx*2;
+            yy_s=(yy*2)-1;
+            yy_e=yy*2;
+            temp=plotarray(yy_s:yy_e,xx_s:xx_e);
+            plotarray_1deg(yy,xx)=nanmean(temp(:));
+        end
+    end
+    clear xx yy xx_s xx_e yy_s yy_e temp
+    plotarray=plotarray_1deg;
+    clear plotarray_1deg
+end
 
 %--- Write out to text file ---
 
@@ -144,9 +188,16 @@ if writetxt
     plotarray_out=int32(plotarray_out);
     
     fid=fopen([outfile_name,'.txt'],'w');
-    for yy=360:-1:1
-        fprintf(fid,repmat('%7d',1,720),plotarray_out(yy,:));
-        fprintf(fid,'\n');
+    if output1deg
+        for yy=180:-1:1
+            fprintf(fid,repmat('%7d',1,360),plotarray_out(yy,:));
+            fprintf(fid,'\n');
+        end
+    else
+        for yy=360:-1:1
+            fprintf(fid,repmat('%7d',1,720),plotarray_out(yy,:));
+            fprintf(fid,'\n');
+        end
     end
     clear yy
     fclose(fid);
@@ -164,11 +215,19 @@ if writenetcdf
         plotarray_out=plotarray;
     end
     
-    minlat=-89.75;
-    maxlat=89.75;
-    minlon=-179.75;
-    maxlon=179.75;
-    gridspace=0.5;
+    if output1deg
+        minlat=-89.5;
+        maxlat=89.5;
+        minlon=-179.5;
+        maxlon=179.5;
+        gridspace=1.0;
+    else
+        minlat=-89.75;
+        maxlat=89.75;
+        minlon=-179.75;
+        maxlon=179.75;
+        gridspace=0.5;
+    end
     
     latgrid=minlat:gridspace:maxlat;
     longrid=minlon:gridspace:maxlon;
@@ -193,5 +252,44 @@ if writenetcdf
     ncwriteatt(outfile,'/','Institution','University of Birmingham, UK');
     ncwriteatt(outfile,'/','Contact','Thomas Pugh, t.a.m.pugh@bham.ac.uk');
     ncwriteatt(outfile,'/','Version',['Version 1: ',date]);
+    
+end
+
+
+%--- Make some regional statistics ---
+
+if makeregionstats
+    % Read and prepare the region mask
+    bmask_temp=flipud(geotiffread([bmask_dir,'/temperate_biome_025degree.tif']));
+    bmask_bor=flipud(geotiffread([bmask_dir,'/boreal_biome_025degree.tif']));
+    bmask_025=zeros(size(bmask_temp));
+    bmask_025(bmask_temp==1)=1;
+    bmask_025(bmask_bor==1)=2;
+    rmask=NaN(180,360);
+    for xx=1:720
+        for yy=1:360
+            xx_s=(xx*2)-1;
+            xx_e=xx*2;
+            yy_s=(yy*2)-1;
+            yy_e=yy*2;
+            temp=bmask_025(yy_s:yy_e,xx_s:xx_e);
+            rmask(yy,xx)=mode(temp(:));
+        end
+    end
+    rmask(rmask==0)=NaN;
+    clear xx yy xx_s xx_e yy_s yy_e
+    clear bmask_025
+    clear temp
+    nregion=2;
+    regions={'Boreal forest','Temperate forest'};
+    regions_short={'boreal','temperate'};
+    
+    % Get forest area (for weighting)
+    garea=global_grid_area();
+    farea=ffrac.*garea;
+    
+    % Calculate stats
+    plotarray_median_temp=wmedian(plotarray(rmask==1),farea(rmask==1));
+    plotarray_median_boreal=wmedian(plotarray(rmask==2),farea(rmask==2));
     
 end

@@ -1,5 +1,13 @@
 % Plot biomes from LPJ-GUESS in comparison to those from observation-based estimates.
 %
+% Dependencies
+% - lpjg_biome_func-m
+% - hengl_biome_read.m
+% - hickler_biome_read.m
+% - readmasks_func.m
+% - lpj_to_grid_func_centre.m
+% - cbrewer (https://uk.mathworks.com/matlabcentral/fileexchange/34087-cbrewer-colorbrewer-schemes-for-matlab)
+%
 % T. Pugh
 % 03.01.21
 
@@ -8,17 +16,7 @@ use_fmask=true; %Mask by current forest area
 ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
-%writetxt=false; %Write out to text file
-%outfile_name='simplemodel_best_est_100patch_10pCanopyCover_biomes_v2.txt';
-
-%lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/simplemodel_best_est_100patch';
-%lpjg_dir='/Users/pughtam/LPJG/bugfix_lu_progdist_ageout_runs/best_est';
-%lpjg_dir='/Users/pughtam/LPJG/bugfix_lu_progdist_ageout_runs/best_est_luh2';
-%lpjg_dir='/Users/pughtam/LPJG/bugfix_lu_progdist_ageout_runs/best_est_adjparam';
 lpjg_dir='/Users/pughtam/LPJG/bugfix_lu_progdist_ageout_runs/best_est_adjparam_latosa4000';
-%lpjg_dir='/Users/pughtam/LPJG/trunk_r8640_benchmark';
-%lpjg_dir='/Users/pughtam/LPJG/trunk_r8278_aitkinresp/Output_global';
-%lpjg_dir='/Users/pughtam/LPJG/disturbance_prognostic_runs/100_flat_orig_r5511/postproc/';
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
@@ -113,10 +111,6 @@ axis tight
 caxis([-1 9])
 t1=textm(28,-175,'(a) LPJ-GUESS');
 set(t1,'FontSize',12,'FontWeight','Bold')
-% c1=colorbar;
-% set(c1,'FontSize',12,'FontWeight','Bold')
-% set(c1,'Limits',[1 cmax])
-% set(c1,'Ticks',1.5:9,'TickLabels',biomenames([4:9,11:13]))
 
 s2=subplot(3,1,2);
 hold on
@@ -130,10 +124,6 @@ axis tight
 caxis([-1 9])
 t2=textm(28,-175,'(b) Hengl et al. (2018)');
 set(t2,'FontSize',12,'FontWeight','Bold')
-% c2=colorbar;
-% set(c2,'FontSize',12,'FontWeight','Bold')
-% set(c2,'Limits',[1 cmax])
-% set(c2,'Ticks',1.5:9.5,'TickLabels',biomenames_hengl([4:9,11:13]))
 
 s3=subplot(3,1,3);
 hold on
@@ -156,21 +146,4 @@ set(s1,'Position',[0.01 0.67 0.7750 0.3])
 set(s2,'Position',[0.01 0.34 0.7750 0.3])
 set(s3,'Position',[0.01 0.01 0.7750 0.3])
 set(c3,'Position',[0.785 0.34 0.0148 0.3])
-
-
-%--- Write out to text file ---
-
-% if writetxt
-%     biome_out=biome;
-%     biome_out(isnan(biome))=-9999;
-%     biome_out=int32(biome_out);
-%     
-%     fid=fopen(outfile_name,'w');
-%     for yy=360:-1:1
-%         fprintf(fid,repmat('%7d',1,720),biome_out(yy,:));
-%         fprintf(fid,'\n');
-%     end
-%     clear yy
-%     fclose(fid);
-% end
 

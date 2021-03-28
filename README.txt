@@ -15,8 +15,6 @@ Folder: disturbance_rates
 - average_turover_rates.R, calibrate disturbance rate model for all forests
 - average_turover_rates_closedforest.R, calibrate disturbance rate model for closed canopy forests
 - cluster_assignment.R, map disturbance acitivity clusters to traits/climte using a multi-modal model
-- figure2.R, code for producing Figure 2
-- figure3.R, code for producing Figure 3
 
 Folder: ESA_processing
 - esa_broadleaf_frac_0p5deg.m, classify ESA landcover into broadleaf and needleleaf classes
@@ -31,4 +29,24 @@ Folder: obs_biomes
 - vegmap18.out, data file for Haxeltine and Prentice biomes
 
 Folder: lpjg_processing
+- trait_to_lpjg_mapping_tempbor.m, script to map trait values from species level to LPJ-GUESS PFTs (Figure S4, parameterisation for LPJ-GUESS)
+- plot_global_distint_diff_map.m, plot map of difference between disturbance rotation periods from two different simulations and write processed data out to a text file (feeds into Figure 2).
+- plot_global_distint_uncer_map.m, plot map of uncertainty in disturbance rotation periods, showing the absolute range of uncertainty divided by the best estimate (Figure S2, feeds into Figure 2).
+- plot_global_cturn_diff_map.m, plot map of difference in carbon turnover from two different simulations and write processed data out to a text file (used for C turnover calculations in text).
+- age_dist_plot.m, create age structure plots by region based on LPJ-GUESS output, including Figure S5 and Figure S6.
+- gfad_breakdown_region.m, split up the GFAD age class data into regions. Dependency for age_dist_plot.m
+- readmasks_func.m, create the masks for low vegetation C mass, low forested area or non temperate/boreal biomes.
+- hengl_lpjg_biome_comp.m, plot biomes from LPJ-GUESS in comparison to those from observation-based estimates (Figure S1).
+- lpjg_biome_func.m, function to convert LPJ-GUESS LAI output into a biome classification.
+- plot_global_distint_map.m, plot map of disturbance rotation periods and write processed data out to a text file.
+- plot_pft_frac_map.m, script to make map of fraction of tree cover which is broadleaf for LPJ-GUESS and ESA data (Figure S2).
+- figure2.R, code for producing Figure 2
+- figure3.R, code for producing Figure 3
+
+Folder: lpjg_processing/helper_functions
+- gfad_regions.m, script to take the GFAD regions and process them into something more accessible for plotting.
+- reg_simplify.m, further simplify (i.e. aggregate) GFAD regions for plotting.
+- global_grid_area.m, calculate the area of each grid cell.
+- lpj_to_grid_func_centre.m, function to read in a LPJ-GUESS output file and reformat it into a multi-dimensional array suitable for making Matlab plots with.
+
 
