@@ -9,6 +9,8 @@
 % Dependencies:
 % - readmasks_func.m
 % - lpj_to_grid_func_centre.m
+% - global_grid_area.m
+% - wprctile.m (https://uk.mathworks.com/matlabcentral/fileexchange/16920-returns-weighted-percentiles-of-a-sample)
 %
 % T. Pugh
 % 12.01.19
@@ -62,6 +64,9 @@ clear cflux2
 
 [cvegmask,fmask,bmask,ffrac,bmask_temp,bmask_bor]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir1,fmask_dir,fmask_file,bmask_dir);
 
+garea=global_grid_area();
+
+farea=ffrac.*garea; %Forest area in m2
 
 %--- Data processing ---
 
@@ -171,19 +176,25 @@ diffperc_ctau_median_temp=wmedian(diffperc_ctau_temp,weights_temp);
 diffperc_ctau_mean_boreal=wmean(diffperc_ctau_boreal,weights_boreal);
 diffperc_ctau_mean_temp=wmean(diffperc_ctau_temp,weights_temp);
 
-diffperc_ctau_10perc_boreal=prctile(diffperc_ctau_boreal,10);
-diffperc_ctau_90perc_boreal=prctile(diffperc_ctau_boreal,90);
-diffperc_ctau_10perc_temp=prctile(diffperc_ctau_temp,10);
-diffperc_ctau_90perc_temp=prctile(diffperc_ctau_temp,90);
+diffperc_ctau_10perc_boreal=wprctile(diffperc_ctau_boreal,10,weights_boreal);
+diffperc_ctau_90perc_boreal=wprctile(diffperc_ctau_boreal,90,weights_boreal);
+diffperc_ctau_10perc_temp=wprctile(diffperc_ctau_temp,10,weights_temp);
+diffperc_ctau_90perc_temp=wprctile(diffperc_ctau_temp,90,weights_temp);
 
 % Calculate mean biome-level stats
-cveg1_boreal=cveg1(bmask_bor==1);
-cveg2_boreal=cveg2(bmask_bor==1);
-npp1_boreal=npp1(bmask_bor==1);
-npp2_boreal=npp2(bmask_bor==1);
-csoil1_boreal=csoil1(bmask_bor==1);
-csoil2_boreal=csoil2(bmask_bor==1);
-weights_boreal=ffrac(bmask_bor==1);
+cveg1_area=cveg1.*farea;
+cveg2_area=cveg2.*farea;
+csoil1_area=csoil1.*farea;
+csoil2_area=csoil2.*farea;
+npp1_area=npp1.*farea;
+npp2_area=npp2.*farea;
+
+cveg1_boreal=cveg1_area(bmask_bor==1);
+cveg2_boreal=cveg2_area(bmask_bor==1);
+npp1_boreal=npp1_area(bmask_bor==1);
+npp2_boreal=npp2_area(bmask_bor==1);
+csoil1_boreal=csoil1_area(bmask_bor==1);
+csoil2_boreal=csoil2_area(bmask_bor==1);
 
 ctau1_boreal=nansum(cveg1_boreal)/nansum(npp1_boreal);
 ctau2_boreal=nansum(cveg2_boreal)/nansum(npp2_boreal);
@@ -191,13 +202,15 @@ ctau_diff_allboreal_perc=((ctau2_boreal-ctau1_boreal)/ctau1_boreal)*100;
 ctaueco1_boreal=nansum(csoil1_boreal)/nansum(npp1_boreal);
 ctaueco2_boreal=nansum(csoil2_boreal)/nansum(npp2_boreal);
 ctaueco_diff_allboreal_perc=((ctaueco2_boreal-ctaueco1_boreal)/ctaueco1_boreal)*100;
+cveg1_sum_boreal=nansum(cveg1_boreal);
+cveg2_sum_boreal=nansum(cveg2_boreal);
 
-cveg1_temp=cveg1(bmask_temp==1);
-cveg2_temp=cveg2(bmask_temp==1);
-npp1_temp=npp1(bmask_temp==1);
-npp2_temp=npp2(bmask_temp==1);
-csoil1_temp=csoil1(bmask_temp==1);
-csoil2_temp=csoil2(bmask_temp==1);
+cveg1_temp=cveg1_area(bmask_temp==1);
+cveg2_temp=cveg2_area(bmask_temp==1);
+npp1_temp=npp1_area(bmask_temp==1);
+npp2_temp=npp2_area(bmask_temp==1);
+csoil1_temp=csoil1_area(bmask_temp==1);
+csoil2_temp=csoil2_area(bmask_temp==1);
 weights_temp=ffrac(bmask_temp==1);
 
 ctau1_temp=nansum(cveg1_temp)/nansum(npp1_temp);
@@ -206,6 +219,8 @@ ctau_diff_alltemp_perc=((ctau2_temp-ctau1_temp)/ctau1_temp)*100;
 ctaueco1_temp=nansum(csoil1_temp)/nansum(npp1_temp);
 ctaueco2_temp=nansum(csoil2_temp)/nansum(npp2_temp);
 ctaueco_diff_alltemp_perc=((ctaueco2_temp-ctaueco1_temp)/ctaueco1_temp)*100;
+cveg1_sum_temp=nansum(cveg1_temp);
+cveg2_sum_temp=nansum(cveg2_temp);
 
 
 %--- Write out to text file ---
