@@ -46,7 +46,6 @@ clitter1=cpool1(:,:,2);
 clear cpool1
 
 cflux1=squeeze(lpj_to_grid_func_centre([lpjg_dir1,'/cflux_2001_2014'],1,0));
-crepro1=cflux1(:,:,2);
 npp1=-cflux1(:,:,1);
 ctau1=cveg1./npp1;
 clear cflux1
@@ -59,7 +58,6 @@ clitter2=cpool2(:,:,2);
 clear cpool2
     
 cflux2=squeeze(lpj_to_grid_func_centre([lpjg_dir2,'/cflux_2001_2014'],1,0));
-crepro2=cflux2(:,:,2);
 npp2=-cflux2(:,:,1);
 ctau2=cveg2./npp2;
 clear cflux2

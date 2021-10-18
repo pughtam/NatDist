@@ -7,7 +7,7 @@ Cornelius Senf, Technical University of Munich, corneliussenf@gmail.com
 
 ## Description
 Scripts underlying analysis in:
-Thomas A. M. Pugh, Rupert Seidl, Daijun Liu, Mats Lindeskog, Cornelius Senf, The anthropogenic imprint on temperate and boreal forest demography and carbon turnover.
+Thomas A. M. Pugh, Rupert Seidl, Daijun Liu, Mats Lindeskog, Louise P. Chini, Cornelius Senf, The anthropogenic imprint on temperate and boreal forest demography and carbon turnover.
 
 Folder: disturbance_rates
 - aggregate_hansen_forestcover.R, aggregate forest cover and disturbances from Hansen to definition of open/closed-canopy forests used by Pugh et al. 2019 Nature Geosciences

@@ -13,12 +13,11 @@ function [biome,biomenames]=lpjg_biome_func(lai,biome_scheme)
 treelai=nansum(lai(:,:,1:10),3);
 grasslai=nansum(lai(:,:,11:12),3);
 totlai=nansum(lai,3);
-trbelai=nansum(lai(:,:,8:9),3);
-bnelai=nansum(lai(:,:,1:2),3);
+trbelai=nansum(lai(:,:,8:9),3); %TrBE & TrIBE
 trlai=nansum(lai(:,:,8:10),3); %Tropical trees
 telai=nansum(lai(:,:,4:7),3); %Temperate trees
 btlai=nansum(lai(:,:,1:3),3); %Boreal trees
-bneelai=nansum(lai(:,:,1:2),3);
+bneelai=nansum(lai(:,:,1:2),3); %BNE & BINE
 
 lats=repmat(-89.75:0.5:89.75,[720 1])';
 

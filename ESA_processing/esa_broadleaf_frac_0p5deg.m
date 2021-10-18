@@ -66,8 +66,8 @@ for ii=1:720
         indlon_e=ii*nloncell;
         temp_broad=mask_broad(indlat_s:indlat_e,indlon_s:indlon_e);
         temp_needle=mask_needle(indlat_s:indlat_e,indlon_s:indlon_e);
-	temp_broad_sum=sum(temp_broad(:));
-	temp_needle_sum=sum(temp_needle(:));
+        temp_broad_sum=sum(temp_broad(:));
+        temp_needle_sum=sum(temp_needle(:));
         broadleaf_frac_esa(jj,ii)=(temp_broad_sum/(temp_broad_sum+temp_needle_sum))*100;
     end
     fprintf('%d\n',ii)

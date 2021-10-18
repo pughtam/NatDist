@@ -30,11 +30,11 @@ lpjg_dir_lowest_luh='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/T
 lpjg_dir_highest_luh='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000_luh2high/';
 
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
-fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
+fmask_file='hansen_forested_canopy_frac_0p5deg.nc4'; %Produced from forest_mask/hansen_forest_canopy_calc_frac.m
 bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
 ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask file
 
-gfad_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1.nc';
+gfad_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1.nc'; %B. Poulter, et al., The global forest age dataset and its uncertainties (GFADv1.1) (2019) https:/doi.org/doi.pangaea.de/10.1594/PANGAEA.897392.
 gfad_upper_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1_upperbound.nc';
 gfad_lower_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1_lowerbound.nc';
 

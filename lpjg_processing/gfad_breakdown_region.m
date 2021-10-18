@@ -69,29 +69,17 @@ if use_fmask
     gfad_upper_fage_frac=gfad_upper_fage(:,:,:)./repmat(gfad_upper_fage_totfor(:,:),[1 1 nages]);
     gfad_lower_fage_frac=gfad_lower_fage(:,:,:)./repmat(gfad_lower_fage_totfor(:,:),[1 1 nages]);
     % Convert to areas using provided forest fraction file
-%     if use_luh2mask
-%         gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(fmask.*garea.*luh2mask,[1 1 nages]);
-%         gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(fmask.*garea.*luh2mask,[1 1 nages]);
-%         gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(fmask.*garea.*luh2mask,[1 1 nages]);
-%     else
-        gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(fmask.*garea,[1 1 nages]);
-        gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(fmask.*garea,[1 1 nages]);
-        gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(fmask.*garea,[1 1 nages]);
-%     end
+    gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(fmask.*garea,[1 1 nages]);
+    gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(fmask.*garea,[1 1 nages]);
+    gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(fmask.*garea,[1 1 nages]);
 else
     gfad_fage_frac=gfad_fage;
     gfad_upper_fage_frac=gfad_upper_fage;
     gfad_lower_fage_frac=gfad_lower_fage;
     % Convert to areas directly as forest fraction is already incorporated in the data
-%     if use_luh2mask
-%         gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(garea.*luh2mask,[1 1 nages]);
-%         gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(garea.*luh2mask,[1 1 nages]);
-%         gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(garea.*luh2mask,[1 1 nages]);
-%     else
-        gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(garea,[1 1 nages]);
-        gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(garea,[1 1 nages]);
-        gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(garea,[1 1 nages]);
-%     end
+    gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(garea,[1 1 nages]);
+    gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(garea,[1 1 nages]);
+    gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(garea,[1 1 nages]);
 end
 
 % Aggregate age distributions over regions
@@ -110,26 +98,4 @@ for rr=1:nregion
     end
 end
 clear aa rr gfad_fage_area_sel
-
-% % Aggregate age distributions over the globe
-% gfad_fage_globe=NaN(nages,1);
-% gfad_upper_fage_globe=NaN(nages,1);
-% gfad_lower_fage_globe=NaN(nages,1);
-% for aa=1:nages
-%     gfad_fage_area_sel=squeeze(gfad_fage_area(:,:,aa));
-%     gfad_upper_fage_area_sel=squeeze(gfad_upper_fage_area(:,:,aa));
-%     gfad_lower_fage_area_sel=squeeze(gfad_lower_fage_area(:,:,aa));
-%     gfad_fage_globe(aa)=squeeze(nansum(gfad_fage_area_sel(:)))/1e12;
-%     gfad_upper_fage_globe(aa)=squeeze(nansum(gfad_upper_fage_area_sel(:)))/1e12;
-%     gfad_lower_fage_globe(aa)=squeeze(nansum(gfad_lower_fage_area_sel(:)))/1e12;
-% end
-% clear aa gfad_fage_area_sel
-
-% % Calculate percentages
-% gfad_fage_reg_perc=(gfad_fage_reg./repmat(sum(gfad_fage_reg,2),[1 nages]))*100;
-% gfad_upper_fage_reg_perc=(gfad_upper_fage_reg./repmat(sum(gfad_upper_fage_reg,2),[1 nages]))*100;
-% gfad_lower_fage_reg_perc=(gfad_lower_fage_reg./repmat(sum(gfad_lower_fage_reg,2),[1 nages]))*100;
-% gfad_fage_globe_perc=(gfad_fage_globe./sum(gfad_fage_globe,1))*100;
-% gfad_upper_fage_globe_perc=(gfad_upper_fage_globe./sum(gfad_upper_fage_globe,1))*100;
-% gfad_lower_fage_globe_perc=(gfad_lower_fage_globe./sum(gfad_lower_fage_globe,1))*100;
 
