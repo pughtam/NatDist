@@ -41,7 +41,8 @@ ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask
 % Read cpool and cflux data
 cpool1=squeeze(lpj_to_grid_func_centre([lpjg_dir1,'/cpool_2001_2014'],1,0));
 cveg1=cpool1(:,:,1);
-csoil1=sum(cpool1(:,:,2:3),3);
+csoil1=cpool1(:,:,3);
+clitter1=cpool1(:,:,2);
 clear cpool1
 
 cflux1=squeeze(lpj_to_grid_func_centre([lpjg_dir1,'/cflux_2001_2014'],1,0));
@@ -53,7 +54,8 @@ clear cflux1
 
 cpool2=squeeze(lpj_to_grid_func_centre([lpjg_dir2,'/cpool_2001_2014'],1,0));
 cveg2=cpool2(:,:,1);
-csoil2=sum(cpool2(:,:,2:3),3);
+csoil2=cpool2(:,:,3);
+clitter2=cpool2(:,:,2);
 clear cpool2
     
 cflux2=squeeze(lpj_to_grid_func_centre([lpjg_dir2,'/cflux_2001_2014'],1,0));
@@ -76,10 +78,12 @@ if use_cvegmask
     cveg1=cveg1.*cvegmask;
     npp1=npp1.*cvegmask;
     csoil1=csoil1.*cvegmask;
+    clitter1=clitter1.*cvegmask;
     ctau1=ctau1.*cvegmask;
     cveg2=cveg2.*cvegmask;
     npp2=npp2.*cvegmask;
     csoil2=csoil2.*cvegmask;
+    clitter2=clitter2.*cvegmask;
     ctau2=ctau2.*cvegmask;
 end
 
@@ -87,10 +91,12 @@ if use_fmask
     cveg1=cveg1.*fmask;
     npp1=npp1.*fmask;
     csoil1=csoil1.*fmask;
+    clitter1=clitter1.*fmask;
     ctau1=ctau1.*fmask;
     cveg2=cveg2.*fmask;
     npp2=npp2.*fmask;
     csoil2=csoil2.*fmask;
+    clitter2=clitter2.*fmask;
     ctau2=ctau2.*fmask;
 end
 
@@ -98,10 +104,12 @@ if use_bmask
     cveg1=cveg1.*bmask;
     npp1=npp1.*bmask;
     csoil1=csoil1.*bmask;
+    clitter1=clitter1.*bmask;
     ctau1=ctau1.*bmask;
     cveg2=cveg2.*bmask;
     npp2=npp2.*bmask;
     csoil2=csoil2.*bmask;
+    clitter2=clitter2.*bmask;
     ctau2=ctau2.*bmask;
 end
 
@@ -161,12 +169,12 @@ end
 
 % Calculate stats across grid cells, weighted by forest cover area
 diffperc_ctau_boreal=diffperc_ctau(bmask_bor==1);
-weights_boreal=ffrac(bmask_bor==1);
+weights_boreal=farea(bmask_bor==1);
 weights_boreal(isnan(diffperc_ctau_boreal))=[];
 diffperc_ctau_boreal(isnan(diffperc_ctau_boreal))=[];
 
 diffperc_ctau_temp=diffperc_ctau(bmask_temp==1);
-weights_temp=ffrac(bmask_temp==1);
+weights_temp=farea(bmask_temp==1);
 weights_temp(isnan(diffperc_ctau_temp))=[];
 diffperc_ctau_temp(isnan(diffperc_ctau_temp))=[];
 
@@ -181,11 +189,35 @@ diffperc_ctau_90perc_boreal=wprctile(diffperc_ctau_boreal,90,weights_boreal);
 diffperc_ctau_10perc_temp=wprctile(diffperc_ctau_temp,10,weights_temp);
 diffperc_ctau_90perc_temp=wprctile(diffperc_ctau_temp,90,weights_temp);
 
+
+diffperc_clitter_boreal=((clitter2(bmask_bor==1)-clitter1(bmask_bor==1))./clitter1(bmask_bor==1))*100;
+weights_boreal_litt=farea(bmask_bor==1);
+weights_boreal_litt(isnan(diffperc_clitter_boreal))=[];
+diffperc_clitter_boreal(isnan(diffperc_clitter_boreal))=[];
+
+diffperc_clitter_temp=((clitter2(bmask_temp==1)-clitter1(bmask_temp==1))./clitter1(bmask_temp==1))*100;
+weights_temp_litt=farea(bmask_temp==1);
+weights_temp_litt(isnan(diffperc_clitter_temp))=[];
+diffperc_clitter_temp(isnan(diffperc_clitter_temp))=[];
+
+diffperc_clitter_median_boreal=wmedian(diffperc_clitter_boreal,weights_boreal_litt);
+diffperc_clitter_median_temp=wmedian(diffperc_clitter_temp,weights_temp_litt);
+
+diffperc_clitter_mean_boreal=wmean(diffperc_clitter_boreal,weights_boreal_litt);
+diffperc_clitter_mean_temp=wmean(diffperc_clitter_temp,weights_temp_litt);
+
+diffperc_clitter_10perc_boreal=wprctile(diffperc_clitter_boreal,10,weights_boreal_litt);
+diffperc_clitter_90perc_boreal=wprctile(diffperc_clitter_boreal,90,weights_boreal_litt);
+diffperc_clitter_10perc_temp=wprctile(diffperc_clitter_temp,10,weights_temp_litt);
+diffperc_clitter_90perc_temp=wprctile(diffperc_clitter_temp,90,weights_temp_litt);
+
 % Calculate mean biome-level stats
 cveg1_area=cveg1.*farea;
 cveg2_area=cveg2.*farea;
 csoil1_area=csoil1.*farea;
 csoil2_area=csoil2.*farea;
+clitter1_area=clitter1.*farea;
+clitter2_area=clitter2.*farea;
 npp1_area=npp1.*farea;
 npp2_area=npp2.*farea;
 
@@ -195,15 +227,21 @@ npp1_boreal=npp1_area(bmask_bor==1);
 npp2_boreal=npp2_area(bmask_bor==1);
 csoil1_boreal=csoil1_area(bmask_bor==1);
 csoil2_boreal=csoil2_area(bmask_bor==1);
+clitter1_boreal=clitter1_area(bmask_bor==1);
+clitter2_boreal=clitter2_area(bmask_bor==1);
 
 ctau1_boreal=nansum(cveg1_boreal)/nansum(npp1_boreal);
 ctau2_boreal=nansum(cveg2_boreal)/nansum(npp2_boreal);
 ctau_diff_allboreal_perc=((ctau2_boreal-ctau1_boreal)/ctau1_boreal)*100;
-ctaueco1_boreal=nansum(csoil1_boreal)/nansum(npp1_boreal);
-ctaueco2_boreal=nansum(csoil2_boreal)/nansum(npp2_boreal);
+ctaueco1_boreal=(nansum(csoil1_boreal)+nansum(clitter1_boreal)+nansum(cveg1_boreal))/nansum(npp1_boreal);
+ctaueco2_boreal=(nansum(csoil2_boreal)+nansum(clitter2_boreal)+nansum(cveg2_boreal))/nansum(npp2_boreal);
 ctaueco_diff_allboreal_perc=((ctaueco2_boreal-ctaueco1_boreal)/ctaueco1_boreal)*100;
-cveg1_sum_boreal=nansum(cveg1_boreal);
-cveg2_sum_boreal=nansum(cveg2_boreal);
+cveg1_sum_boreal=nansum(cveg1_boreal)/1e12; %In Pg C
+cveg2_sum_boreal=nansum(cveg2_boreal)/1e12; %In Pg C
+csoil1_sum_boreal=nansum(csoil1_boreal)/1e12; %In Pg C
+csoil2_sum_boreal=nansum(csoil2_boreal)/1e12; %In Pg C
+clitter1_sum_boreal=nansum(clitter1_boreal)/1e12; %In Pg C
+clitter2_sum_boreal=nansum(clitter2_boreal)/1e12; %In Pg C
 
 cveg1_temp=cveg1_area(bmask_temp==1);
 cveg2_temp=cveg2_area(bmask_temp==1);
@@ -211,16 +249,22 @@ npp1_temp=npp1_area(bmask_temp==1);
 npp2_temp=npp2_area(bmask_temp==1);
 csoil1_temp=csoil1_area(bmask_temp==1);
 csoil2_temp=csoil2_area(bmask_temp==1);
+clitter1_temp=clitter1_area(bmask_temp==1);
+clitter2_temp=clitter2_area(bmask_temp==1);
 weights_temp=ffrac(bmask_temp==1);
 
 ctau1_temp=nansum(cveg1_temp)/nansum(npp1_temp);
 ctau2_temp=nansum(cveg2_temp)/nansum(npp2_temp);
 ctau_diff_alltemp_perc=((ctau2_temp-ctau1_temp)/ctau1_temp)*100;
-ctaueco1_temp=nansum(csoil1_temp)/nansum(npp1_temp);
-ctaueco2_temp=nansum(csoil2_temp)/nansum(npp2_temp);
+ctaueco1_temp=(nansum(csoil1_temp)+nansum(clitter1_temp)+nansum(cveg1_temp))/nansum(npp1_temp);
+ctaueco2_temp=(nansum(csoil2_temp)+nansum(clitter2_temp)+nansum(cveg2_temp))/nansum(npp2_temp);
 ctaueco_diff_alltemp_perc=((ctaueco2_temp-ctaueco1_temp)/ctaueco1_temp)*100;
-cveg1_sum_temp=nansum(cveg1_temp);
-cveg2_sum_temp=nansum(cveg2_temp);
+cveg1_sum_temp=nansum(cveg1_temp)/1e12; %In Pg C
+cveg2_sum_temp=nansum(cveg2_temp)/1e12; %In Pg C
+csoil1_sum_temp=nansum(csoil1_temp)/1e12; %In Pg C
+csoil2_sum_temp=nansum(csoil2_temp)/1e12; %In Pg C
+clitter1_sum_temp=nansum(clitter1_temp)/1e12; %In Pg C
+clitter2_sum_temp=nansum(clitter2_temp)/1e12; %In Pg C
 
 
 %--- Write out to text file ---
