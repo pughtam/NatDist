@@ -12,32 +12,36 @@
 %23.08.19
 
 %Get the mapping information for species to PFTs
-fid=fopen('tree_species_traits_PFTmapping_tempbor.csv');
-species_mapping=textscan(fid,'%q %q %q %q %q %d','headerlines',1,'delimiter',',');
-fclose(fid);
-species_all=species_mapping(1);
-PFT_mapping=species_mapping{6};
+[species_mapping,species_mapping_text]=xlsread('../disturbance_rates/data/tree_species_traits_PFTmapping_tempbor.xlsx');
+species_all=species_mapping_text(2:height(species_mapping_text),1);
+PFT_mapping=species_mapping(:,1);
+clear species_mapping species_mapping_text
 
 %Load the landscape information
-fid=fopen('species_v2.csv');
-landsc_data=textscan(fid,'%d %q %d %q %d %q','headerlines',1,'delimiter',',');
-fclose(fid);
-landsc_spec=landsc_data(4);
-landsc_perc=landsc_data{5};
+[landsc_data,landsc_text]=xlsread('../disturbance_rates/data/species.xlsx');
+landsc_spec=landsc_text(2:height(landsc_text),4);
+landsc_perc=landsc_data(:,5);
+clear landsc_data landsc_text
 
 %Load the trait data
-fid=fopen('traits.csv');
-trait_data=textscan(fid,'%q %f %f %f %d','headerlines',1,'delimiter',',');
-fclose(fid);
-trait_spec=trait_data(1);
-trait_H=trait_data{3};
-trait_WD=trait_data{4};
+[trait_data,trait_text]=xlsread('../disturbance_rates/data/traits.xlsx');
+trait_spec=trait_text(2:height(trait_text),1);
+trait_H=trait_data(:,2);
+trait_WD=trait_data(:,3);
+clear trait_data trait_text
+
+%Make some corrections to the species names
+landsc_spec(strcmp(landsc_spec,'Betula neoalaskana'))={'Betula papyrifera'};
+landsc_spec(strcmp(landsc_spec,'Betula pubescens var. pumila'))={'Betula pubescens'};
+landsc_spec(strcmp(landsc_spec,'Picea ajanensis'))={'Picea jezoensis'};
+landsc_spec(strcmp(landsc_spec,'Lophonzonia menziesii'))={'Nothofagus menziesii'};
+landsc_spec(strcmp(landsc_spec,'Drimis winteri'))={'Drimys winteri'};
 
 %Map the trait data to the landscapes
 landsc_H=NaN(size(landsc_perc));
 landsc_WD=NaN(size(landsc_perc));
 for nn=1:length(landsc_perc)
-    itrait = find(ismember(trait_spec{1}, landsc_spec{1}{nn})==1); 
+    itrait = find(ismember(trait_spec, landsc_spec{nn})==1); 
     if ~isempty(itrait)
         landsc_H(nn)=trait_H(itrait);
         landsc_WD(nn)=trait_WD(itrait);
@@ -46,7 +50,7 @@ end
 clear nn itrait
 
 
-nspec=length(species_mapping{1});
+nspec=length(species_all);
 npft=max(PFT_mapping);
 
 %Sum prevalence values for all species across all sites
@@ -56,7 +60,7 @@ spec_WDstd=NaN(nspec,1);
 spec_H=NaN(nspec,1);
 spec_Hstd=NaN(nspec,1);
 for nn=1:nspec
-    ispec = find(ismember(landsc_spec{1}, species_all{1}{nn})==1);    
+    ispec = find(ismember(landsc_spec, species_all{nn})==1);    
     spec_preval_sum(nn)=sum(landsc_perc(ispec));
     %Also extract the species-level values of the traits
     spec_WD(nn)=mean(landsc_WD(ispec));
