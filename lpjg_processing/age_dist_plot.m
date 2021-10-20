@@ -11,14 +11,17 @@
 % 14.01.21
 
 use_cvegmask=true; %Mask by a minimum simulated vegetation biomass density
-use_fmask=true; %Mask by current forest area
+use_fmask=false; %Mask by current forest area (not recommended for age distributions)
 ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
+farea_opt='luh2'; %Forest area weighting to use, either luh2 or hansen (luh2 recommended)
 
 plotgfad=false; %Whether to also plot the GFAD data
 
 outputcsv=true; %Whether to output a csv file for recreating the plots elsewhere
-csvname_stub='age_dist_adjparam_latosa4000';
+csvname_stub='age_dist_adjparam_latosa4000_arealuh2';
+
+addpath('./helper_functions/')
 
 fname='ageclass_2014';
 lpjg_dir_bestest='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000/';
@@ -54,11 +57,20 @@ age_bestest_luh=squeeze(lpj_to_grid_func_centre([lpjg_dir_bestest_luh,'/',fname]
 age_lowest_luh=squeeze(lpj_to_grid_func_centre([lpjg_dir_lowest_luh,'/',fname],1,0)); %Lower bound
 age_highest_luh=squeeze(lpj_to_grid_func_centre([lpjg_dir_highest_luh ,'/',fname],1,0)); %Upper bound
 
-%Correct LUH2 simulations to assume that the whole grid-cell area is forest (because they will later be scaled by observed
-%forest fraction)
-age_bestest_luh=age_bestest_luh./repmat(sum(age_bestest_luh,3),[1 1 nage]);
-age_lowest_luh=age_lowest_luh./repmat(sum(age_lowest_luh,3),[1 1 nage]);
-age_highest_luh=age_highest_luh./repmat(sum(age_highest_luh,3),[1 1 nage]);
+if strcmp(farea_opt,'luh2')
+    %Correct natural-only simulations to assume natural veg (normally forest) on only LUH2 prim+sec landcover fractions
+    age_bestest=age_bestest.*repmat(sum(age_bestest_luh,3),[1 1 nage]);
+    age_lowest=age_lowest.*repmat(sum(age_lowest_luh,3),[1 1 nage]);
+    age_highest=age_highest.*repmat(sum(age_highest_luh,3),[1 1 nage]);
+elseif strcmp(farea_opt,'hansen')
+    %Correct LUH2 simulations to assume that the whole grid-cell area is forest (because they will later be scaled by observed
+    %forest fraction)
+    age_bestest_luh=age_bestest_luh./repmat(sum(age_bestest_luh,3),[1 1 nage]);
+    age_lowest_luh=age_lowest_luh./repmat(sum(age_lowest_luh,3),[1 1 nage]);
+    age_highest_luh=age_highest_luh./repmat(sum(age_highest_luh,3),[1 1 nage]);
+else
+    error('farea_opt must be set to luh2 or hansen')
+end
 
 % Mask arrays
 [cvegmask,fmask,bmask,ffrac]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir_bestest,fmask_dir,fmask_file,bmask_dir);
@@ -98,12 +110,21 @@ rmask=flipud(rmask');
 
 garea=global_grid_area();
 
-age_bestest_area=age_bestest.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
-age_lowest_area=age_lowest.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
-age_highest_area=age_highest.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
-age_bestest_luh_area=age_bestest_luh.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
-age_lowest_luh_area=age_lowest_luh.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
-age_highest_luh_area=age_highest_luh.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
+if strcmp(farea_opt,'luh2')
+    age_bestest_area=age_bestest.*repmat(garea,[1,1,nage]);
+    age_lowest_area=age_lowest.*repmat(garea,[1,1,nage]);
+    age_highest_area=age_highest.*repmat(garea,[1,1,nage]);
+    age_bestest_luh_area=age_bestest_luh.*repmat(garea,[1,1,nage]);
+    age_lowest_luh_area=age_lowest_luh.*repmat(garea,[1,1,nage]);
+    age_highest_luh_area=age_highest_luh.*repmat(garea,[1,1,nage]);
+elseif strcmp(farea_opt,'hansen')
+    age_bestest_area=age_bestest.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
+    age_lowest_area=age_lowest.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
+    age_highest_area=age_highest.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
+    age_bestest_luh_area=age_bestest_luh.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
+    age_lowest_luh_area=age_lowest_luh.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
+    age_highest_luh_area=age_highest_luh.*repmat(ffrac,[1,1,nage]).*repmat(garea,[1,1,nage]);
+end
 
 age_bestest_reg=NaN(nregion,nage);
 age_lowest_reg=NaN(nregion,nage);
@@ -134,10 +155,17 @@ clear age_bestest_luh_area_temp age_lowest_luh_area_temp age_highest_luh_area_te
 % Optionally read the GFAD data
 
 if plotgfad
-    [gfad_fage_reg,gfad_upper_fage_reg,gfad_lower_fage_reg]=gfad_breakdown_region(...
-        gfad_file,gfad_lower_file,gfad_upper_file,...
-        use_cvegmask,use_bmask,use_fmask,...
-        cvegmask,bmask,ffrac,rmask,nregion);
+    if strcmp(farea_opt,'luh2')
+        [gfad_fage_reg,gfad_upper_fage_reg,gfad_lower_fage_reg]=gfad_breakdown_region(...
+            gfad_file,gfad_lower_file,gfad_upper_file,...
+            use_cvegmask,use_bmask,use_fmask,...
+            cvegmask,bmask,sum(age_bestest_luh,3),rmask,nregion);
+    elseif strcmp(farea_opt,'hansen')
+        [gfad_fage_reg,gfad_upper_fage_reg,gfad_lower_fage_reg]=gfad_breakdown_region(...
+            gfad_file,gfad_lower_file,gfad_upper_file,...
+            use_cvegmask,use_bmask,use_fmask,...
+            cvegmask,bmask,ffrac,rmask,nregion);
+    end
 end
 
 
