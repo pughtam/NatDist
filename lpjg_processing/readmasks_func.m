@@ -30,6 +30,7 @@ if use_fmask
     end
 else
     fmask=NaN;
+    ffrac=NaN;
 end
 ffrac=double(ffrac)/100; %Convert from percentage to fraction for output
 
