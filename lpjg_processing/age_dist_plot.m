@@ -18,7 +18,7 @@ farea_opt='luh2'; %Forest area weighting to use, either luh2 or hansen (luh2 rec
 
 plotgfad=false; %Whether to also plot the GFAD data
 
-outputcsv=true; %Whether to output a csv file for recreating the plots elsewhere
+outputcsv=false; %Whether to output a csv file for recreating the plots elsewhere
 csvname_stub='age_dist_adjparam_latosa4000_arealuh2';
 
 addpath('./helper_functions/')
@@ -428,6 +428,14 @@ c1=colorbar;
 set(c1,'FontSize',12,'FontWeight','Bold')
 set(c1,'Limits',[-100 100])
 
+%--- Simple stats for old-growth area change ---
+
+young_area_nat=sum(sum(age_bestest_reg(:,1:14)));
+OG_area_nat=sum(age_bestest_reg(:,15));
+young_area_luh=sum(sum(age_bestest_luh_reg(:,1:14)));
+OG_area_luh=sum(age_bestest_luh_reg(:,15));
+
+OG_area_diff=(OG_area_luh-OG_area_nat)/OG_area_nat;
 
 %--- Output csv file with global outputs for each simulation ---
 
