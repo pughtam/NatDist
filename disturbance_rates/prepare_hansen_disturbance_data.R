@@ -100,4 +100,4 @@ disturbance_rates <- disturbance_rates %>%
 
 # Save to disc ------------------------------------------------------------
 
-write_csv(disturbance_rates, "data/disturbance_rates_landscapes.csv")
+write_csv(disturbance_rates, "data/disturbance_data_landscapes.csv")
