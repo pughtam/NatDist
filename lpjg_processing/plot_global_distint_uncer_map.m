@@ -24,28 +24,29 @@ makeplot=true; %Make a plot
 writetxt=false; %Write array to text file
 outfile_name='simplemodel_best_est_10pCanopyCover_uncerfrac.txt';
 
-lpjg_dir_base='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000';
-lpjg_dir_low='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/low_2se_adjparam_latosa4000';
-lpjg_dir_high='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/high_2se_adjparam_latosa4000';
+lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
+lpjg_file_base='distprob_LPJ-GUESS_standard_nat_2014.nc';
+lpjg_file_low='distprob_LPJ-GUESS_low_nat_2014.nc';
+lpjg_file_high='distprob_LPJ-GUESS_high_nat_2014.nc';
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
-bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
+bmask_dir='./data/';
 ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask file
 
 
 %--- Read in data ---
 
 % Read disturbance interval
-dist_base=squeeze(lpj_to_grid_func_centre([lpjg_dir_base,'/distprob_2001_2014'],1,0));
+dist_base=permute(ncread([lpjg_dir,'/',lpjg_file_base],'distprob'),[2 1]); 
 dist_base(dist_base==0)=NaN;
 
-dist_low=squeeze(lpj_to_grid_func_centre([lpjg_dir_low,'/distprob_2001_2014'],1,0));
+dist_low=permute(ncread([lpjg_dir,'/',lpjg_file_low],'distprob'),[2 1]); 
 dist_low(dist_low==0)=NaN;
 
-dist_high=squeeze(lpj_to_grid_func_centre([lpjg_dir_high,'/distprob_2001_2014'],1,0));
+dist_high=permute(ncread([lpjg_dir,'/',lpjg_file_high],'distprob'),[2 1]); 
 dist_high(dist_high==0)=NaN;
 
-[cvegmask,fmask,bmask]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir_base,fmask_dir,fmask_file,bmask_dir);
+[cvegmask,fmask,bmask]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir);
 
 
 %--- Data processing ---

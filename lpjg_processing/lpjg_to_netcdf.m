@@ -6,6 +6,8 @@
 %T. Pugh
 %20.10.21
 
+addpath('./')
+
 input_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results';
 output_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
 
@@ -35,16 +37,24 @@ for ss=1:nsims
     
     cd(currdir)
     
+    if strcmp(dtype{ss},'anthro')
+        cpool_file='cpool_natural_2001_2014';
+        cflux_file='cflux_natural_2001_2014';
+    else
+        cpool_file='cpool_2001_2014';
+        cflux_file='cflux_2001_2014';
+    end
+    
     %Get cpool data
-    cpool=squeeze(lpj_to_grid_func_centre('cpool_2001_2014',1,0));
+    cpool=squeeze(lpj_to_grid_func_centre(cpool_file,1,0));
     cveg=cpool(:,:,1);
     csoil=cpool(:,:,3);
     clitter=cpool(:,:,2);
     clear cpool
     
     %Get cflux data
-    cflux=squeeze(lpj_to_grid_func_centre('cflux_2001_2014',1,0));
-    npp=cflux(:,:,1);
+    cflux=squeeze(lpj_to_grid_func_centre(cflux_file,1,0));
+    npp=-cflux(:,:,1);
     clear cflux
     
     %Get LAI data

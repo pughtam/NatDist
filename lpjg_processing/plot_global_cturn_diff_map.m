@@ -29,44 +29,35 @@ regstats_sum=true; %Calculate stats based on regional sums
 writetxt=false; %Write array to text file
 outfile_name='simplemodel_closedcanopy_best_est_100patch_5pClosedCanopyCover_Pugh2019diff.txt';
 
-lpjg_dir1='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000';
-lpjg_dir2='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000_luh2';
+lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
+%lpjg_dir1='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000';
+%lpjg_dir2='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000_luh2';
 
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
-bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
+bmask_dir='./data/';
 ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask file
 
-luh2_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/luh2/';
+luh2_dir='./data/';
 luh2_file='lu_1700_2015_luh2_aggregate_sum2x2_midpoint_urban_orig_v20_2001_2014';
 
 %--- Read in data ---
 
 % Read cpool and cflux data
-cpool1=squeeze(lpj_to_grid_func_centre([lpjg_dir1,'/cpool_2001_2014'],1,0));
-cveg1=cpool1(:,:,1);
-csoil1=cpool1(:,:,3);
-clitter1=cpool1(:,:,2);
-clear cpool1
-
-cflux1=squeeze(lpj_to_grid_func_centre([lpjg_dir1,'/cflux_2001_2014'],1,0));
-npp1=-cflux1(:,:,1);
+cveg1=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standard_nat_2014.nc'],'Cveg'),[2 1]);
+clitter1=permute(ncread([lpjg_dir,'/Clitter_LPJ-GUESS_standard_nat_2014.nc'],'Clitter'),[2 1]);
+csoil1=permute(ncread([lpjg_dir,'/Csoil_LPJ-GUESS_standard_nat_2014.nc'],'Csoil'),[2 1]);
+npp1=permute(ncread([lpjg_dir,'/NPP_LPJ-GUESS_standard_nat_2014.nc'],'NPP'),[2 1]);
 ctau1=cveg1./npp1;
-clear cflux1
 
 
-cpool2=squeeze(lpj_to_grid_func_centre([lpjg_dir2,'/cpool_natural_2001_2014'],1,0));
-cveg2=cpool2(:,:,1);
-csoil2=cpool2(:,:,3);
-clitter2=cpool2(:,:,2);
-clear cpool2
-    
-cflux2=squeeze(lpj_to_grid_func_centre([lpjg_dir2,'/cflux_natural_2001_2014'],1,0));
-npp2=-cflux2(:,:,1);
+cveg2=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standard_anthro_2014.nc'],'Cveg'),[2 1]);
+clitter2=permute(ncread([lpjg_dir,'/Clitter_LPJ-GUESS_standard_anthro_2014.nc'],'Clitter'),[2 1]);
+csoil2=permute(ncread([lpjg_dir,'/Csoil_LPJ-GUESS_standard_anthro_2014.nc'],'Csoil'),[2 1]);
+npp2=permute(ncread([lpjg_dir,'/NPP_LPJ-GUESS_standard_anthro_2014.nc'],'NPP'),[2 1]);
 ctau2=cveg2./npp2;
-clear cflux2
 
-[cvegmask,fmask,bmask,ffrac,bmask_temp,bmask_bor]=readmasks_func(use_cvegmask,true,ccmask,use_bmask,lpjg_dir1,fmask_dir,fmask_file,bmask_dir);
+[cvegmask,fmask,bmask,ffrac,bmask_temp,bmask_bor]=readmasks_func(use_cvegmask,true,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir);
 
 garea=global_grid_area();
 

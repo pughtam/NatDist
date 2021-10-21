@@ -23,18 +23,18 @@ csvname_stub='age_dist_adjparam_latosa4000_arealuh2';
 
 addpath('./helper_functions/')
 
-fname='ageclass_2014';
-lpjg_dir_bestest='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000/';
-lpjg_dir_lowest='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/low_2se_adjparam_latosa4000/';
-lpjg_dir_highest='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/high_2se_adjparam_latosa4000/';
+lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
+lpjg_file_bestest='age_LPJ-GUESS_standard_nat_2014.nc';
+lpjg_file_lowest='age_LPJ-GUESS_low_nat_2014.nc';
+lpjg_file_highest='age_LPJ-GUESS_high_nat_2014.nc';
 
-lpjg_dir_bestest_luh='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000_luh2/';
-lpjg_dir_lowest_luh='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000_luh2low/';
-lpjg_dir_highest_luh='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000_luh2high/';
+lpjg_file_bestest_luh='age_LPJ-GUESS_standard_anthro_2014.nc';
+lpjg_file_lowest_luh='age_LPJ-GUESS_low_anthro_2014.nc';
+lpjg_file_highest_luh='age_LPJ-GUESS_high_anthro_2014.nc';
 
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4'; %Produced from forest_mask/hansen_forest_canopy_calc_frac.m
-bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
+bmask_dir='./data/';
 ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask file
 
 gfad_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1.nc'; %B. Poulter, et al., The global forest age dataset and its uncertainties (GFADv1.1) (2019) https:/doi.org/doi.pangaea.de/10.1594/PANGAEA.897392.
@@ -45,17 +45,17 @@ gfad_lower_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1_lowerbound.nc';
 % Read in LPJG age distributions
 
 % Natural-only simulations
-age_bestest=squeeze(lpj_to_grid_func_centre([lpjg_dir_bestest,'/',fname],1,0)); %Best estimate
+age_bestest=permute(ncread([lpjg_dir,'/',lpjg_file_bestest],'age'),[2 1 3]); %Best estimate
 s=size(age_bestest);
 nage=s(3);
 clear s
-age_lowest=squeeze(lpj_to_grid_func_centre([lpjg_dir_lowest,'/',fname],1,0)); %Lower bound
-age_highest=squeeze(lpj_to_grid_func_centre([lpjg_dir_highest,'/',fname],1,0)); %Upper bound
+age_lowest=permute(ncread([lpjg_dir,'/',lpjg_file_lowest],'age'),[2 1 3]); %Lower bound
+age_highest=permute(ncread([lpjg_dir,'/',lpjg_file_highest],'age'),[2 1 3]); %Upper bound
 
 % LUH2 simulations
-age_bestest_luh=squeeze(lpj_to_grid_func_centre([lpjg_dir_bestest_luh,'/',fname],1,0)); %Best estimate
-age_lowest_luh=squeeze(lpj_to_grid_func_centre([lpjg_dir_lowest_luh,'/',fname],1,0)); %Lower bound
-age_highest_luh=squeeze(lpj_to_grid_func_centre([lpjg_dir_highest_luh ,'/',fname],1,0)); %Upper bound
+age_bestest_luh=permute(ncread([lpjg_dir,'/',lpjg_file_bestest_luh],'age'),[2 1 3]); %Best estimate
+age_lowest_luh=permute(ncread([lpjg_dir,'/',lpjg_file_lowest_luh],'age'),[2 1 3]); %Lower bound
+age_highest_luh=permute(ncread([lpjg_dir,'/',lpjg_file_highest_luh],'age'),[2 1 3]); %Upper bound
 
 if strcmp(farea_opt,'luh2')
     %Correct natural-only simulations to assume natural veg (normally forest) on only LUH2 prim+sec landcover fractions
@@ -73,7 +73,7 @@ else
 end
 
 % Mask arrays
-[cvegmask,fmask,bmask,ffrac]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir_bestest,fmask_dir,fmask_file,bmask_dir);
+[cvegmask,fmask,bmask,ffrac]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir);
 
 if use_cvegmask
     age_bestest=age_bestest.*repmat(cvegmask,[1 1 nage]);

@@ -7,8 +7,7 @@ function [cvegmask,fmask,bmask_05,ffrac,bmask_temp_05,bmask_bor_05]=readmasks_fu
 
 % Create mask to exclude grid cells where the vegetation C mass does not meet a threshold of 1 kg C m-2
 if use_cvegmask
-    cpool=lpj_to_grid_func_centre([lpjg_dir,'/cpool_2001_2014'],1,0);
-    cveg=squeeze(cpool(:,:,1));
+    cveg=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standard_nat_2014.nc'],'Cveg'),[2 1]);
     cvegmask=NaN(size(cveg));
     cvegmask(cveg>1)=1;
 else

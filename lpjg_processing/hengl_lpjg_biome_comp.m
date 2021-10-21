@@ -16,10 +16,10 @@ use_fmask=true; %Mask by current forest area
 ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
-lpjg_dir='/Users/pughtam/LPJG/bugfix_lu_progdist_ageout_runs/best_est_adjparam_latosa4000';
+lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
-bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
+bmask_dir='./data/';
 ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask file
 
 addpath('../obs_biomes/')
@@ -27,8 +27,7 @@ addpath('../obs_biomes/')
 
 %--- Read in data ---
 
-lai=squeeze(lpj_to_grid_func_centre([lpjg_dir,'/lai_1961_1990'],1,0));
-lai(:,:,13)=[]; %Remove total column
+lai=permute(ncread([lpjg_dir,'/LAI_LPJ-GUESS_standard_nat_1990.nc'],'LAI'),[2 1 3]);
 
 [cvegmask,fmask,bmask]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir);
 

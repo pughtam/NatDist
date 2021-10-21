@@ -22,8 +22,8 @@ logscale=false; %Plot map using log colour scale
 limitscale=true; %Cap colour scale at 1000 years
 dimplot=1; %Column number in input file containing the disturbance rate
 
-makeplot=false; %Make a plot
-readnetcdf=true; %Read from a netcdf file, otherwise from an LPJ-GUESS output file
+makeplot=true; %Make a plot
+readnetcdf=false; %Read from a netcdf file, otherwise from an LPJ-GUESS output file
 writetxt=false; %Write array to text file
 writenetcdf=false; %Write array to netcdf file
 output1deg=false; %Write netcdf at 1 x 1 degree aggregation, instead of 0.5 x 0.5
@@ -31,14 +31,15 @@ output1deg=false; %Write netcdf at 1 x 1 degree aggregation, instead of 0.5 x 0.
 outfile_name='best_est_adjparam_latosa4000_20patch_10pCanopyCover';
 makeregionstats=true; %Make stats at regional level
 
-%lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000';
-lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results/best_est_adjparam_latosa4000_closedcan';
+lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
+%lpjg_file='distprob_LPJ-GUESS_standard_nat_2014.nc';
+lpjg_file='distprob_LPJ-GUESS_standard_natcc_2014.nc';
 netcdf_file='/Users/pughtam/Documents/GAP_and_other_work/Disturbance/netcdfs_for_deposition/tauO/tauO_standard_forest-area_LUcorrected.nc';
 netcdf_varname='tauO';
 
 fmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal';
 fmask_file='hansen_forested_canopy_frac_0p5deg.nc4';
-bmask_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/biomes/From_Cornelius_inc_boreal';
+bmask_dir='./data/';
 ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask file
 
 
@@ -61,7 +62,7 @@ if readnetcdf
     dist=1./distint;
     clear distint
 else
-    dist=squeeze(lpj_to_grid_func_centre([lpjg_dir,'/distprob_2001_2014'],1,0));
+    dist=permute(ncread([lpjg_dir,'/',lpjg_file],'distprob'),[2 1]); 
     dist(dist==0)=NaN;
 end
 
