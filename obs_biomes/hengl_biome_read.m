@@ -31,8 +31,7 @@ function [biomes_0p5,biomenames]=hengl_biome_read(simplebiomes)
 % T. Pugh
 % 05.07.20
 
-% Note: edits needed to geotiffinfo.m to read this multilayer file. See https://cosmojiang.wordpress.com/2018/04/02/matlab-geotiffread-for-multiple-layers/
-[biomes,cmap,refmat,bbox]=geotiffread('/Users/pughtam/data/hengl_biomes/pnv_biome.type_biome00k_c_1km_s0..0cm_2000..2017_v0.1.tif');
+biomes=readgeoraster('/Users/pughtam/data/hengl_biomes/pnv_biome.type_biome00k_c_1km_s0..0cm_2000..2017_v0.1.tif');
 biomes=flipud(biomes);
 
 ndims=size(biomes);
