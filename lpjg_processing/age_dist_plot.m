@@ -41,8 +41,7 @@ gfad_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1.nc'; %B. Poulter, et al., The
 gfad_upper_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1_upperbound.nc';
 gfad_lower_file='/Users/pughtam/data/GFAD_V1-1/GFAD_V1-1_lowerbound.nc';
 
-%---
-% Read in LPJG age distributions
+%% Read in LPJG age distributions
 
 % Natural-only simulations
 age_bestest=permute(ncread([lpjg_dir,'/',lpjg_file_bestest],'age'),[2 1 3]); %Best estimate
@@ -151,8 +150,7 @@ end
 clear nn cc age_bestest_area_temp age_lowest_area_temp age_highest_area_temp
 clear age_bestest_luh_area_temp age_lowest_luh_area_temp age_highest_luh_area_temp
 
-%---
-% Optionally read the GFAD data
+%% Optionally read the GFAD data
 
 if plotgfad
     if strcmp(farea_opt,'luh2')
@@ -169,8 +167,7 @@ if plotgfad
 end
 
 
-%---
-% Bearing in mind that best estimate does not always fit within the maximum and minimum values, find upper and lower bounds
+%% Bearing in mind that best estimate does not always fit within the maximum and minimum values, find upper and lower bounds
 % of the overall ranges
 age_bestest_reg_min=min(cat(3,age_bestest_reg,age_lowest_reg,age_highest_reg),[],3);
 age_bestest_reg_max=max(cat(3,age_bestest_reg,age_lowest_reg,age_highest_reg),[],3);
@@ -183,8 +180,7 @@ if plotgfad
     gfad_reg_max=max(cat(3,gfad_fage_reg,gfad_lower_fage_reg,gfad_upper_fage_reg),[],3);
 end
 
-%---
-% Make age class plots for all relevant regions
+%% Make age class plots for all relevant regions
 
 ages=5:10:150;
 
@@ -256,8 +252,7 @@ for rr=[10 9 7 5 6 14 13 15 2 3 4 12 11]
 end
 clear rr cc
 
-%---
-% Make age class plot with a simplified set of regions
+%% Make age class plot with a simplified set of regions
 
 [age_bestest_regsim,regions_sim,nregionsim]=reg_simplify(age_bestest_reg,nage);
 [age_bestest_regsim_min]=reg_simplify(age_bestest_reg_min,nage);
@@ -393,15 +388,13 @@ set(ss(7),'Position',[0.53 0.40 0.18 0.25])
 set(ss(8),'Position',[0.77 0.40 0.18 0.25])
 set(ss(9),'Position',[0.17 0.07 0.6 0.2])
 
-%---
-% Calculate some totals
+%% Calculate some totals
 
 % All temperate forest old-growth
 sum(age_bestest_regsim([2,3,4,5,8],15)) %Natural
 sum(age_bestest_luh_regsim([2,3,4,5,8],15)) %LUH2
 
-%---
-%Map the reductions in old-growth
+%% Map the reductions in old-growth
 figure
 %Read mask for ocean areas
 load(ocean_file);
@@ -412,8 +405,9 @@ oceanm=oceanm';
 lons=-180:0.5:179.5;
 lats=-90:0.5:89.5;
 
-cmap=flipud(colormap(redblue(200)));
-cmap=[repmat([0.9 0.9 0.9],[100 1]); cmap];
+%cmap=flipud(colormap(redblue(200)));
+cmap=colorbarpzn(-100,100,'colorZ','y','wrs',0.05,'rev','off');
+cmap=[repmat([0.9 0.9 0.9],[floor(length(cmap)/2) 1]); cmap];
 
 colormap(cmap)
 axesm('MapProjection','robinson','MapLatLimit',[23 80])
@@ -428,7 +422,7 @@ c1=colorbar;
 set(c1,'FontSize',12,'FontWeight','Bold')
 set(c1,'Limits',[-100 100])
 
-%--- Simple stats for old-growth area change ---
+%% Simple stats for old-growth area change
 
 young_area_nat=sum(sum(age_bestest_reg(:,1:14)));
 OG_area_nat=sum(age_bestest_reg(:,15));
@@ -437,7 +431,7 @@ OG_area_luh=sum(age_bestest_luh_reg(:,15));
 
 OG_area_diff=(OG_area_luh-OG_area_nat)/OG_area_nat;
 
-%--- Output csv file with global outputs for each simulation ---
+%% Output csv file with global outputs for each simulation
 
 if outputcsv
     % Output csv files with regional outputs for each simulation
