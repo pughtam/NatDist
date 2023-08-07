@@ -139,17 +139,19 @@ for ss=1:nS
     end
 
 
-    % Now convert the units for the LPJ-GUESS output to be consistent with the ESA values
+    % Now convert the units for the ESA values to be consistent with LPJ-GUESS output
     % LPJ-GUESS is in kg C m-2 total biomass
     % ESA is in Mg DM ha-1 AGB (This is defined as the mass, expressed as oven-dry weight of the woody parts (stem,
     % bark, branches and twigs) of all living trees excluding stump and roots)
     m2_per_ha=1e4;
     kg_per_Mg=1000;
     C_per_DM=0.5;
-    agb_frac=0.75; %NOTE: Need to get a reference for an appropriate value
+    agb_frac=0.78; % https://www.nature.com/articles/s41559-021-01485-1
 
-    lpjg_biomass_mean(ss)=lpjg_biomass_mean(ss)*m2_per_ha/kg_per_Mg/C_per_DM*agb_frac;
-    lpjg_biomass_std(ss)=lpjg_biomass_std(ss)*m2_per_ha/kg_per_Mg/C_per_DM*agb_frac;
+    esa_biomass_mean(ss)=esa_biomass_mean(ss)/m2_per_ha*kg_per_Mg*C_per_DM/agb_frac;
+    esa_biomass_nanmean(ss)=esa_biomass_nanmean(ss)/m2_per_ha*kg_per_Mg*C_per_DM/agb_frac;
+    esa_biomass_median(ss)=esa_biomass_median(ss)/m2_per_ha*kg_per_Mg*C_per_DM/agb_frac;
+    esa_biomass_sd(ss)=esa_biomass_sd(ss)/m2_per_ha*kg_per_Mg*C_per_DM/agb_frac;
 
     fprintf('Completed %d out of %d landscapes\n',ss,nS)
 
@@ -165,8 +167,8 @@ plot(esa_biomass_nanmean(50:77),lpjg_biomass_mean(50:77),'bo')
 set(gca,'XLim',[0 350],'YLim',[0 350])
 l1=line([0 350],[0 350]);
 set(l1,'linestyle',':','color','k')
-xlabel('ESA AGB (Mg ha^{-1})')
-ylabel('LPJ-GUESS AGB (Mg ha^{-1})')
+xlabel('ESA biomass (kg C m^{-2})')
+ylabel('LPJ-GUESS biomass (kg C m^{-2})')
 
 
 % Make a gridlist for test these sites with LPJ-GUESS
