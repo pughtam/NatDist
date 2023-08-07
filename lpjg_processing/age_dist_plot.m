@@ -241,11 +241,9 @@ for rr=[10 9 7 5 6 14 13 15 2 3 4 12 11]
     %end
     if cc==1 || cc==5 || cc==9 || cc==13
         ylabel(p1(1),'Young forest area (M km^{-2})')
-        %ylabel(p1(1),'Young forest area (M km^{-2})')
     end
     if cc==4 || cc==8 || cc==12 || cc==16
-        ylabel(p1(2),'OG forest area (M km^{-2})')
-        %ylabel(p1(2),'OG forest area (M km^{-2})')
+        ylabel(p1(2),'Old forest area (M km^{-2})')
         set(get(p1(2),'Ylabel'),'Rotation',270,'VerticalAlignment','bottom')
     end
     title(regions{rr})
@@ -334,11 +332,9 @@ for rr=1:nregionsim
     end
     if cc==1 || cc==5 || cc==9 || cc==13
         ylabel(p1(1),'Young forest area (M km^{-2})','FontWeight','bold')
-        %ylabel(p1(1),'Young forest area (M km^{-2})')
     end
     if cc==4 || cc==8 || cc==12 || cc==16
         ylabel(p1(2),'Old forest area (M km^{-2})','FontWeight','bold')
-        %ylabel(p1(2),'OG forest area (M km^{-2})')
         set(get(p1(2),'Ylabel'),'Rotation',270,'VerticalAlignment','bottom')
     end
     title([panelletters{rr},' ',regions_sim{rr}])
