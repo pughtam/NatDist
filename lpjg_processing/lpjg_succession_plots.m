@@ -73,6 +73,27 @@ for region=1:2
 
 end
 
+for nn=1:9
+    if nn<=6
+        subplot(3,3,nn)
+        set(gca,'XTickLabel','')
+    else
+        subplot(3,3,nn)
+        xlabel('Years')
+    end
+    if nn==1 || nn==4 || nn==7
+        subplot(3,3,nn)
+        ylabel('kg C m^{-2}')
+    else
+        subplot(3,3,nn)
+        set(gca,'YTickLabel','')
+    end
+end
+clear nn
+
+
+
+
 
 
 
