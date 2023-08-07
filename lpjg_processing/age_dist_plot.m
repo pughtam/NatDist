@@ -337,7 +337,7 @@ for rr=1:nregionsim
         %ylabel(p1(1),'Young forest area (M km^{-2})')
     end
     if cc==4 || cc==8 || cc==12 || cc==16
-        ylabel(p1(2),'OG forest area (M km^{-2})','FontWeight','bold')
+        ylabel(p1(2),'Old forest area (M km^{-2})','FontWeight','bold')
         %ylabel(p1(2),'OG forest area (M km^{-2})')
         set(get(p1(2),'Ylabel'),'Rotation',270,'VerticalAlignment','bottom')
     end
@@ -406,6 +406,7 @@ lons=-180:0.5:179.5;
 lats=-90:0.5:89.5;
 
 %cmap=flipud(colormap(redblue(200)));
+addpath('../external_functions/colorbarpzn/')
 cmap=colorbarpzn(-100,100,'colorZ','y','wrs',0.05,'rev','off');
 cmap=[repmat([0.9 0.9 0.9],[floor(length(cmap)/2) 1]); cmap];
 
