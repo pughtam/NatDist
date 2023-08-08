@@ -164,8 +164,8 @@ figure
 plot(esa_biomass_nanmean(1:49),lpjg_biomass_mean(1:49),'ro')
 hold on
 plot(esa_biomass_nanmean(50:77),lpjg_biomass_mean(50:77),'bo')
-set(gca,'XLim',[0 350],'YLim',[0 350])
-l1=line([0 350],[0 350]);
+set(gca,'XLim',[0 16],'YLim',[0 16])
+l1=line([0 16],[0 16]);
 set(l1,'linestyle',':','color','k')
 xlabel('ESA biomass (kg C m^{-2})')
 ylabel('LPJ-GUESS biomass (kg C m^{-2})')
