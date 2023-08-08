@@ -3,26 +3,26 @@
 % T. Pugh 23.07.23
 
 calc_indata=false; % true = calculate which cells are in the landscape (first time, slow), false = read this information from precreated mat files
-lpjg_from_netcdf=true; % Read LPJ-GUESS data from netcdf files or directly from testruns for the individual landscapes
+lpjg_from_netcdf=true; % Read LPJ-GUESS data from netcdf files (true) or directly from test runs (false) for the individual landscapes (only used during development work)
+write_test_gridlist=false; % Create a gridlist for test runs with LPJ-GUESS for the 77 sites.
 
 % Set the data directories
 esa_dir='/Users/pughtam/data/ESA_CCI_Biomass';
 land_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/landscape_outlines';
-lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_tests/';
+lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
 
 % Get the ESA CCI biomass data
 % Downloaded from https://data.ceda.ac.uk/neodc/esacci/biomass/data/agb/maps/v3.0/netcdf
 lon=ncread([esa_dir,'/ESACCI-BIOMASS-L4-AGB-MERGED-100m-2010-fv3.0.nc'],'lon');
 lat=ncread([esa_dir,'/ESACCI-BIOMASS-L4-AGB-MERGED-100m-2010-fv3.0.nc'],'lat');
-% Size of grid cells
-%loninc=lon(2)-lon(1);
-%latinc=lat(1)-lat(2);
 
 % Get the LPJ-GUESS biomass data
 if lpjg_from_netcdf
-    lpjg_veg=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standardIBS150BNE300normalkl_nat_2014.nc'],'Cveg'),[2 1]);
-    lpjg_lon=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standardIBS150BNE300normalkl_nat_2014.nc'],'longitude'),[2 1]);
-    lpjg_lat=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standardIBS150BNE300normalkl_nat_2014.nc'],'latitude'),[2 1]);
+    lpjg_veg=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standard_nat_2014.nc'],'Cveg'),[2 1]);
+    lpjg_veg_min=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_low_nat_2014.nc'],'Cveg'),[2 1]);
+    lpjg_veg_max=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_high_nat_2014.nc'],'Cveg'),[2 1]);
+    lpjg_lon=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standard_nat_2014.nc'],'longitude'),[2 1]);
+    lpjg_lat=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standard_nat_2014.nc'],'latitude'),[2 1]);
 else
     lpjg_in=readtable('/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_site_sims/landscapes_IBS150_BNE300/cpool.out','FileType','delimitedtext');
     [~,ia,ic]=unique(lpjg_in(:,1:2));
@@ -54,6 +54,8 @@ esa_biomass_nanmean=NaN(nS,1);
 esa_biomass_median=NaN(nS,1);
 esa_biomass_sd=NaN(nS,1);
 lpjg_biomass_mean=NaN(nS,1);
+lpjg_biomass_min_mean=NaN(nS,1);
+lpjg_biomass_max_mean=NaN(nS,1);
 lpjg_biomass_std=NaN(nS,1);
 for ss=1:nS
 
@@ -111,6 +113,8 @@ for ss=1:nS
 
         lpjg_biomass_mean(ss)=mean(lpjg_veg(ilpjg));
         lpjg_biomass_std(ss)=std(lpjg_veg(ilpjg)); % Note that this standard deviation is not comparable to that of the ESA biomass data because of the different scales that it is calculated over
+        lpjg_biomass_min_mean(ss)=mean(lpjg_veg_min(ilpjg));
+        lpjg_biomass_max_mean(ss)=mean(lpjg_veg_max(ilpjg));
     else
         % Assume that the lpj-guess simulations are conducted in the same order
 
@@ -158,44 +162,56 @@ for ss=1:nS
 end
 clear ss
 
-save('biomass_esa_lpjg.mat','lpjg_biomass_mean','lpjg_biomass_std','esa_biomass_mean','esa_biomass_sd')
+%save('biomass_esa_lpjg.mat','lpjg_biomass_mean','lpjg_biomass_std','esa_biomass_nanmean','esa_biomass_sd')
 
+% Make a figure comparing the observations and model and calculate some statistics
 figure
-plot(esa_biomass_nanmean(1:49),lpjg_biomass_mean(1:49),'ro')
+plot(esa_biomass_nanmean(1:49),lpjg_biomass_mean(1:49),'o','color',[0.7 0 0],'markerfacecolor',[0.7 0 0])
 hold on
-plot(esa_biomass_nanmean(50:77),lpjg_biomass_mean(50:77),'bo')
+plot(esa_biomass_nanmean(50:77),lpjg_biomass_mean(50:77),'bo','markerfacecolor','b')
+lpjg_biomass_min_overall=min(cat(2,lpjg_biomass_mean,lpjg_biomass_min_mean,lpjg_biomass_max_mean),[],2); %Note that because of non-linearities in the model, minimum and maximum disturbance rates may not translate into minimum and maximum biomass, hence finding the overall min and max here.
+lpjg_biomass_max_overall=max(cat(2,lpjg_biomass_mean,lpjg_biomass_min_mean,lpjg_biomass_max_mean),[],2);
+for nn=1:49
+    plot([esa_biomass_nanmean(nn),esa_biomass_nanmean(nn)],[lpjg_biomass_min_overall(nn),lpjg_biomass_max_overall(nn)],...
+        'color',[0.7 0 0],'linewidth',2)
+end
+for nn=50:77
+    plot([esa_biomass_nanmean(nn),esa_biomass_nanmean(nn)],[lpjg_biomass_min_overall(nn),lpjg_biomass_max_overall(nn)],...
+        'color','b','linewidth',2)
+end
+clear nn
 set(gca,'XLim',[0 16],'YLim',[0 16])
 l1=line([0 16],[0 16]);
 set(l1,'linestyle',':','color','k')
 xlabel('ESA biomass (kg C m^{-2})')
 ylabel('LPJ-GUESS biomass (kg C m^{-2})')
+legend('Boreal','Temperate')
+legend boxoff
 
+r=corrcoef(esa_biomass_nanmean,lpjg_biomass_mean);
+r2=r(1,2)^2;
+fprintf('R^2 = %f\n',r2)
 
-% Make a gridlist for test these sites with LPJ-GUESS
-landlons=NaN(length(S),1);
-landlats=NaN(length(S),1);
-for nn=1:nS
-    landlons(nn)=nanmean(S(nn).X);
-    landlats(nn)=nanmean(S(nn).Y);
+rmse=sqrt(sum((lpjg_biomass_mean-esa_biomass_nanmean).^2)/length(lpjg_biomass_mean));
+fprintf('RMSE = %f kg C m-2\n',rmse)
+
+mean_bias=sum(lpjg_biomass_mean-esa_biomass_nanmean)/length(lpjg_biomass_mean);
+fprintf('Mean bias = %f kg C m-2\n',mean_bias)
+
+mean_esa_biomass=mean(esa_biomass_nanmean);
+fprintf('Mean ESA biomass = %f kg C m-2\n',mean_esa_biomass)
+
+% If required, make a gridlist for testing these sites with LPJ-GUESS
+if write_test_gridlist
+    landlons=NaN(length(S),1);
+    landlats=NaN(length(S),1);
+    for nn=1:nS
+        landlons(nn)=nanmean(S(nn).X);
+        landlats(nn)=nanmean(S(nn).Y);
+    end
+    clear nn
+    writetable(table(landlons,landlats),'gridlist_landscapes.txt','delimiter',' ')
 end
-clear nn
-writetable(table(landlons,landlats),'gridlist_landscapes.txt','delimiter',' ')
 
-
-% Some checking for where overestimates are occurring
-aa=find(lpjg_biomass_mean>esa_biomass_mean);
-landlons=NaN(length(S),1);
-landlats=NaN(length(S),1);
-for nn=1:nS
-    landlons(nn)=nanmean(S(nn).X);
-    landlats(nn)=nanmean(S(nn).Y);
-end
-clear nn
-figure
-plot(landlons,landlats,'ko')
-hold on
-plot(landlons(aa),landlats(aa),'ro')
-load coastlines
-plot(coastlon, coastlat, 'k');
 
 
