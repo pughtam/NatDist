@@ -14,7 +14,7 @@
 
 use_cvegmask=true; %Mask by a minimum simulated vegetation biomass density
 use_fmask=true; %Mask by current forest area
-ccmask=true; %Use a closed-canopy forest mask (if use_fmask=true)
+ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 
 distvar=true; %Plot as disturbance return interval (true) or raw variable (false)
@@ -24,16 +24,16 @@ dimplot=1; %Column number in input file containing the disturbance rate
 
 makeplot=true; %Make a plot
 readnetcdf=false; %Read from a netcdf file, otherwise from an LPJ-GUESS output file
-writetxt=false; %Write array to text file
-writenetcdf=false; %Write array to netcdf file
+writetxt=true; %Write array to text file
+writenetcdf=true; %Write array to netcdf file
 output1deg=false; %Write netcdf at 1 x 1 degree aggregation, instead of 0.5 x 0.5
-%outfile_name='best_est_adjparam_latosa4000_closedcan_20patch_5pClosedCanopyCover_1deg';
-outfile_name='best_est_adjparam_latosa4000_20patch_10pCanopyCover';
+%outfile_name='best_est_adjparam_closedcan_20patch_5pClosedCanopyCover_1deg';
+outfile_name='best_est_adjparam_100patch_10pCanopyCover';
 makeregionstats=true; %Make stats at regional level
 
 lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
-%lpjg_file='distprob_LPJ-GUESS_standard_nat_2014.nc';
-lpjg_file='distprob_LPJ-GUESS_standard_natcc_2014.nc';
+lpjg_file='distprob_LPJ-GUESS_standard_nat_2014.nc';
+%lpjg_file='distprob_LPJ-GUESS_standard_natcc_2014.nc';
 netcdf_file='/Users/pughtam/Documents/GAP_and_other_work/Disturbance/netcdfs_for_deposition/tauO/tauO_standard_forest-area_LUcorrected.nc';
 netcdf_varname='tauO';
 
@@ -250,9 +250,9 @@ if writenetcdf
     ncwriteatt(outfile,'tau','longname','Modelled disturbance rotation time')
     ncwriteatt(outfile,'tau','units','years')
     
-    ncwriteatt(outfile,'/','Institution','University of Birmingham, UK');
-    ncwriteatt(outfile,'/','Contact','Thomas Pugh, t.a.m.pugh@bham.ac.uk');
-    ncwriteatt(outfile,'/','Version',['Version 1: ',date]);
+    ncwriteatt(outfile,'/','Institution','Lund University, Sweden');
+    ncwriteatt(outfile,'/','Contact','Thomas Pugh, thomas.pugh@nateko.lu.se');
+    ncwriteatt(outfile,'/','Version',['Version 2: ',date]);
     
 end
 

@@ -15,7 +15,7 @@ use_bmask=true; %Mask by temperate/boreal biomes
 
 writetxt=false; %Write out to text file
 
-outfile_name='best_est_adjparam_latosa4000_10pCanopyCover_broadleaf_frac.txt';
+outfile_name='best_est_adjparam_10pCanopyCover_broadleaf_frac.txt';
 outfile_esa_name='esa_10pCanopyCover_broadleaf_frac.txt';
 
 lpjg_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
@@ -76,6 +76,7 @@ lats=-90:0.5:89.5;
 
 %LPJ-GUESS
 figure
+s1=subplot(2,1,1);
 cmap=colormap(parula(ncgrad));
 cmap=[0.9 0.9 0.9; cmap];
 cminraw=cmin-(cmax/ncgrad);
@@ -93,9 +94,10 @@ caxis([cminraw cmax])
 c1=colorbar;
 set(c1,'FontSize',12,'FontWeight','Bold')
 set(c1,'Limits',[cmin cmax])
+title('(a) LPJ-GUESS')
 
 %ESA
-figure
+s2=subplot(2,1,2);
 cmap=colormap(parula(ncgrad));
 cmap=[0.9 0.9 0.9; cmap];
 cminraw=cmin-(cmax/ncgrad);
@@ -110,9 +112,11 @@ p1=pcolorm(lats,lons,broadleaf_frac_esa);
 set(p1,'linestyle','none')
 axis tight
 caxis([cminraw cmax])
-c1=colorbar;
-set(c1,'FontSize',12,'FontWeight','Bold')
-set(c1,'Limits',[cmin cmax])
+title('(b) ESA')
+
+set(s1,'Position',[0.01 0.50 0.7750 0.46])
+set(s2,'Position',[0.01 0.01 0.7750 0.46])
+set(c1,'Position',[0.8 0.34 0.0148 0.3])
 
 
 %--- Write out to text files ---

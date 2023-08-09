@@ -66,4 +66,4 @@ ncwriteatt(outfile,'/','Note1',note1);
 ncwriteatt(outfile,'/','Reference','This data is described in: Pugh, T.A.M., Seidl, R., Lindeskog, M., Liu, D., Chini, L.P., Senf, C., The anthropogenic imprint on temperate and boreal forest demography and carbon turnover');
 ncwriteatt(outfile,'/','Institution','Lund University, Sweden');
 ncwriteatt(outfile,'/','Contact','Thomas Pugh, thomas.pugh@nateko.lu.se');
-ncwriteatt(outfile,'/','Version',['Version 1: ',date]);
+ncwriteatt(outfile,'/','Version',['Version 2: ',date]);
