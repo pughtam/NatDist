@@ -1,10 +1,11 @@
-%Write netcdf files for all uptake data underlying manuscript figures for data deposition.
-%The basis is tslice files from LPJ-GUESS which give means over the years 2001-2014.
+% Write netcdf files for all data underlying manuscript figures for data deposition.
+% All other calculations with LPJ-GUESS data should be based on these netcdf files
+% The basis is tslice files from LPJ-GUESS which give means over the years 2001-2014.
 %
-%Dependencies: write_netcdf_lpjg.m
+% Dependencies: write_netcdf_lpjg.m
 %
-%T. Pugh
-%20.10.21
+% T. Pugh
+% 20.10.21
 
 addpath('./')
 
@@ -68,6 +69,10 @@ for ss=1:nsims
     %Get disturbance probability data
     distprob_in=squeeze(lpj_to_grid_func_centre('distprob_2001_2014',1,0));
     distprob=distprob_in(:,:,1);
+    if ss==1
+        temprange=distprob_in(:,:,5);
+        WD=distprob_in(:,:,6);
+    end
     clear distprob_in
     
     %Get age class data
@@ -167,6 +172,34 @@ for ss=1:nsims
     write_netcdf_lpjg(distprob,variable,modname,disttype,realisation,year,...
         units,variable_longname,output_dir,note1);
     
+    if ss==1
+        %Temperature range
+        variable='temprange';
+        variable_longname='Temperature range';
+        units='degrees C';
+        disttype=dtype{ss};
+        realisation=dreal{ss};
+        modname='LPJ-GUESS';
+        year=2014;
+        note1='This data is the mean over the period 2001-2014, the year variable in this file is nominal';
+
+        write_netcdf_lpjg(temprange,variable,modname,disttype,realisation,year,...
+            units,variable_longname,output_dir,note1);
+
+        %Wood density
+        variable='wooddensity';
+        variable_longname='Community mean wood density';
+        units='kg DM m-3';
+        disttype=dtype{ss};
+        realisation=dreal{ss};
+        modname='LPJ-GUESS';
+        year=2014;
+        note1='This data is the mean over the period 2001-2014, the year variable in this file is nominal';
+
+        write_netcdf_lpjg(temprange,variable,modname,disttype,realisation,year,...
+            units,variable_longname,output_dir,note1);
+    end
+
     %Age class fraction
     variable='age';
     variable_longname='Stand age';
