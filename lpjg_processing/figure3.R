@@ -12,11 +12,11 @@ library(sf)
 
 # Get data ----------------------------------------------------------------
 
-regions <- list.files("results/age_structure", ".csv") %>% 
-  gsub("age_dist_adjparam_latosa4000_region_", "", .) %>% 
+regions <- list.files("./", ".csv") %>% 
+  gsub("age_dist_adjparam_arealuh2_region_", "", .) %>% 
   gsub(".csv", "", .)
 
-dat <- list.files("results/age_structure", ".csv", full.names = TRUE) %>%
+dat <- list.files("./", ".csv", full.names = TRUE) %>%
   map(read_csv, skip = 1) %>%
   set_names(regions) %>%
   bind_rows(.id = "region") %>%
@@ -81,9 +81,9 @@ p <- ggplot() +
   scale_color_brewer(palette = "Set1") +
   scale_y_continuous(sec.axis = sec_axis( trans = ~.*10, name = bquote("Old-growth forest area (M"~km^2*")")))
 
-ggsave("results/age_structure/age_structure.pdf", p, width = 7.5, height = 4.5)
+ggsave("age_structure.pdf", p, width = 7.5, height = 4.5)
 
-regions_map <- "results/age_structure/gfad_region_map.txt" %>%
+regions_map <- "gfad_region_map.txt" %>%
   read_table(., col_names = FALSE) %>%
   as.matrix(.) %>%
   raster(.)
@@ -114,7 +114,7 @@ for (i in unique(regions_map_sf$region)) {
     scale_x_continuous(limits = c(-155, 170)) +
     scale_y_continuous(limits = c(-55, 85))
   
-  ggsave(paste0("results/age_structure/region_map_", i, ".pdf"), p, width = 0.5, height = 0.25)
+  ggsave(paste0("region_map_", i, ".pdf"), p, width = 0.5, height = 0.25)
   
 }
 
