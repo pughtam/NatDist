@@ -16,10 +16,10 @@ ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 farea_opt='luh2'; %Forest area weighting to use, either luh2 or hansen (luh2 recommended)
 
-plotgfad=false; %Whether to also plot the GFAD data
+plotgfad=true; %Whether to also plot the GFAD data
 
 outputcsv=false; %Whether to output a csv file for recreating the plots elsewhere
-csvname_stub='age_dist_adjparam_latosa4000_arealuh2';
+csvname_stub='age_dist_adjparam_arealuh2';
 
 addpath('./helper_functions/')
 
@@ -72,7 +72,7 @@ else
 end
 
 % Mask arrays
-[cvegmask,fmask,bmask,ffrac]=readmasks_func(use_cvegmask,use_fmask,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir);
+[cvegmask,fmask,bmask,ffrac]=readmasks_func(use_cvegmask,true,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir); % Always read the fmask data to have ffrac if needed for rescaling GFAD (if farea_opt==hansen)
 
 if use_cvegmask
     age_bestest=age_bestest.*repmat(cvegmask,[1 1 nage]);
@@ -153,16 +153,17 @@ clear age_bestest_luh_area_temp age_lowest_luh_area_temp age_highest_luh_area_te
 %% Optionally read the GFAD data
 
 if plotgfad
+    use_ffrac=true; % Rescale the GFAD area fractions with another dataset (LUH2 or Hansen as given below)
     if strcmp(farea_opt,'luh2')
         [gfad_fage_reg,gfad_upper_fage_reg,gfad_lower_fage_reg]=gfad_breakdown_region(...
             gfad_file,gfad_lower_file,gfad_upper_file,...
-            use_cvegmask,use_bmask,use_fmask,...
-            cvegmask,bmask,sum(age_bestest_luh,3),rmask,nregion);
+            use_cvegmask,use_bmask,use_fmask,use_ffrac,...
+            cvegmask,bmask,sum(age_bestest_luh,3),fmask,rmask,nregion);
     elseif strcmp(farea_opt,'hansen')
         [gfad_fage_reg,gfad_upper_fage_reg,gfad_lower_fage_reg]=gfad_breakdown_region(...
             gfad_file,gfad_lower_file,gfad_upper_file,...
-            use_cvegmask,use_bmask,use_fmask,...
-            cvegmask,bmask,ffrac,rmask,nregion);
+            use_cvegmask,use_bmask,use_fmask,use_ffrac,...
+            cvegmask,bmask,ffrac,fmask,rmask,nregion);
     end
 end
 
@@ -427,6 +428,13 @@ young_area_luh=sum(sum(age_bestest_luh_reg(:,1:14)));
 OG_area_luh=sum(age_bestest_luh_reg(:,15));
 
 OG_area_diff=(OG_area_luh-OG_area_nat)/OG_area_nat;
+
+if plotgfad
+    young_area_gfad=sum(sum(gfad_fage_reg(:,1:14)));
+    OG_area_gfad=sum(gfad_fage_reg(:,15));
+
+    OG_area_diff_gfad=(OG_area_gfad-OG_area_nat)/OG_area_nat;
+end
 
 %% Output csv file with global outputs for each simulation
 

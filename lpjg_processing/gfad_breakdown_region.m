@@ -1,7 +1,7 @@
 function [gfad_fage_reg,gfad_upper_fage_reg,gfad_lower_fage_reg]=gfad_breakdown_region(...
     gfad_file,gfad_lower_file,gfad_upper_file,...
-    use_cvegmask,use_bmask,use_fmask,...
-    cvegmask,bmask,ffrac,rmask,nregion)
+    use_cvegmask,use_bmask,use_fmask,use_ffrac,...
+    cvegmask,bmask,ffrac,fmask,rmask,nregion)
 % Split up the GFAD age class data into regions.
 %
 % Dependencies:
@@ -38,21 +38,22 @@ clear gfad_size gfad_lower_size nages_lower
 %--- Read in forest or overall area masks ---
 
 if use_cvegmask && use_fmask && use_bmask
-    fmask=cvegmask.*ffrac.*bmask;
+    mask=cvegmask.*fmask.*bmask;
 elseif use_cvegmask && use_fmask
-    fmask=cvegmask.*ffrac;
+    mask=cvegmask.*fmask;
 elseif use_fmask && use_bmask
-    fmask=ffrac.*bmask;
+    mask=fmask.*bmask;
 elseif use_cvegmask
-    fmask=cvegmask;
+    mask=cvegmask;
 elseif use_fmask
-    fmask=ffrac;
+    mask=fmask;
 elseif use_bmask
-    fmask=bmask;
+    mask=bmask;
 else
-    fmask=ones(size(cvegmask));
+    mask=ones(size(cvegmask));
 end
-fmask=fliplr(fmask');
+mask=fliplr(mask');
+ffrac=fliplr(ffrac');
 
 %--- Calculate regional and global age distributions ---
 
@@ -63,23 +64,23 @@ garea=global_grid_area()';
 gfad_fage_totfor=squeeze(nansum(gfad_fage,3)); %Total forest fraction
 gfad_upper_fage_totfor=squeeze(nansum(gfad_fage,3)); %Total forest fraction
 gfad_lower_fage_totfor=squeeze(nansum(gfad_fage,3)); %Total forest fraction
-if use_fmask
+if use_ffrac
     % Standardise by total forest fraction (i.e. convert to fraction of gridcell to allow to use forest fraction from another database)
     gfad_fage_frac=gfad_fage(:,:,:)./repmat(gfad_fage_totfor(:,:),[1 1 nages]);
     gfad_upper_fage_frac=gfad_upper_fage(:,:,:)./repmat(gfad_upper_fage_totfor(:,:),[1 1 nages]);
     gfad_lower_fage_frac=gfad_lower_fage(:,:,:)./repmat(gfad_lower_fage_totfor(:,:),[1 1 nages]);
     % Convert to areas using provided forest fraction file
-    gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(fmask.*garea,[1 1 nages]);
-    gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(fmask.*garea,[1 1 nages]);
-    gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(fmask.*garea,[1 1 nages]);
+    gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(ffrac.*mask.*garea,[1 1 nages]);
+    gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(ffrac.*mask.*garea,[1 1 nages]);
+    gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(ffrac.*mask.*garea,[1 1 nages]);
 else
     gfad_fage_frac=gfad_fage;
     gfad_upper_fage_frac=gfad_upper_fage;
     gfad_lower_fage_frac=gfad_lower_fage;
     % Convert to areas directly as forest fraction is already incorporated in the data
-    gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(garea,[1 1 nages]);
-    gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(garea,[1 1 nages]);
-    gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(garea,[1 1 nages]);
+    gfad_fage_area=gfad_fage_frac(:,:,:).*repmat(mask.*garea,[1 1 nages]);
+    gfad_upper_fage_area=gfad_upper_fage_frac(:,:,:).*repmat(mask.*garea,[1 1 nages]);
+    gfad_lower_fage_area=gfad_lower_fage_frac(:,:,:).*repmat(mask.*garea,[1 1 nages]);
 end
 
 % Aggregate age distributions over regions
