@@ -61,8 +61,8 @@ for ss=1:nsims
     lai=squeeze(lpj_to_grid_func_centre('lai_2001_2014',1,0));
     lai=lai(:,:,1:length(PFTs));
     if ss==1
-        lai_1990=squeeze(lpj_to_grid_func_centre('lai_1961_1990',1,0));
-        lai_1990=lai_1990(:,:,1:length(PFTs));
+        lai_1930=squeeze(lpj_to_grid_func_centre('lai_1901_1930',1,0));
+        lai_1930=lai_1930(:,:,1:length(PFTs));
     end
     
     %Get disturbance probability data
@@ -147,10 +147,10 @@ for ss=1:nsims
         disttype=dtype{ss};
         realisation=dreal{ss};
         modname='LPJ-GUESS';
-        year=1990;
+        year=1930;
         note1='This data is the mean over the period 1961-1990, the year variable in this file is nominal';
         
-        write_netcdf_lpjg(lai_1990,variable,modname,disttype,realisation,year,...
+        write_netcdf_lpjg(lai_1930,variable,modname,disttype,realisation,year,...
             units,variable_longname,output_dir,note1,PFTs,'PFT');
     end
     
