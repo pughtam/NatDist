@@ -23,8 +23,6 @@ wooddensity(wooddensity==0)=NaN;
 
 % Get the landscape-level climate and disturbance data
 data_landscape=readtable('../disturbance_rates/data/traits_landscape.csv');
-% Convert wood density units from kg C m-3 to kg DM m-3
-data_landscape.wooddensity_pft=data_landscape.wooddensity_pft*2;
 
 % Define the trait space occupied
 chull=convhull(data_landscape.temp_range,data_landscape.wooddensity_species);
