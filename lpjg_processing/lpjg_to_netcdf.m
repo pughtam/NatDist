@@ -196,7 +196,7 @@ for ss=1:nsims
         year=2014;
         note1='This data is the mean over the period 2001-2014, the year variable in this file is nominal';
 
-        write_netcdf_lpjg(temprange,variable,modname,disttype,realisation,year,...
+        write_netcdf_lpjg(WD,variable,modname,disttype,realisation,year,...
             units,variable_longname,output_dir,note1);
     end
 
