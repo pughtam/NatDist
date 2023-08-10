@@ -79,7 +79,7 @@ p <- ggplot() +
        y = bquote("Young forest area (M"~km^2*")"),
        col = NULL, shape = NULL, fill = NULL) +
   scale_color_brewer(palette = "Set1") +
-  scale_y_continuous(sec.axis = sec_axis( trans = ~.*10, name = bquote("Old-growth forest area (M"~km^2*")")))
+  scale_y_continuous(sec.axis = sec_axis( trans = ~.*10, name = bquote("Old forest area (M"~km^2*")")))
 
 ggsave("age_structure.pdf", p, width = 7.5, height = 4.5)
 
