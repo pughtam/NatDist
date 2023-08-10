@@ -23,7 +23,7 @@ limitscale=true; %Cap colour scale at 1000 years
 dimplot=1; %Column number in input file containing the disturbance rate
 
 makeplot=true; %Make a plot
-readnetcdf=false; %Read from a netcdf file, otherwise from an LPJ-GUESS output file
+readnetcdf=false; %Read from a netcdf file from Pugh et al., (2019), otherwise from an LPJ-GUESS output file from this study
 writetxt=true; %Write array to text file
 writenetcdf=true; %Write array to netcdf file
 output1deg=false; %Write netcdf at 1 x 1 degree aggregation, instead of 0.5 x 0.5
