@@ -12,6 +12,9 @@ addpath('./')
 input_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/LPJG_results';
 output_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/netcdfs_for_deposition/';
 
+luh2_dir='/Users/pughtam/Documents/TreeMort/Analyses/Temperate_dist/TempBoreal/NatDist_working_Jul23/lpjg_processing/data/';
+luh2_file='lu_1700_2015_luh2_aggregate_sum2x2_midpoint_urban_orig_v20_2001_2014';
+
 sims={'best_est_adjparam_IBS150BNE300_p100','low_2se_adjparam_IBS150BNE300','high_2se_adjparam_IBS150BNE300',...
 'best_est_adjparam_IBS150BNE300_luh2','best_est_adjparam_IBS150BNE300_luh2low','best_est_adjparam_IBS150BNE300_luh2high',...
 'best_est_adjparam_IBS150BNE300_closedcan'};
@@ -57,6 +60,24 @@ for ss=1:nsims
     cflux=squeeze(lpj_to_grid_func_centre(cflux_file,1,0));
     npp=-cflux(:,:,1);
     clear cflux
+
+    %Get GPP data
+    if ss==1
+        agpp=squeeze(lpj_to_grid_func_centre('agpp_2001_2014',1,0));
+        gpp=agpp(:,:,13);
+        fprintf('Note: If changing code, need to take care to check correct column is used for GPP\n')
+        clear agpp
+    elseif ss==4
+        agpp=squeeze(lpj_to_grid_func_centre('agpp_2001_2014',1,0));
+        gpp=agpp(:,:,26);
+        fprintf('Note: If changing code, need to take care to check correct column is used for GPP\n')
+        clear agpp
+        % Correct by LUH2 fraction here to keep consistent with other output files
+        luh2_in=squeeze(lpj_to_grid_func_centre([luh2_dir,'/',luh2_file],1,0));
+        luh2_ffrac=luh2_in(:,:,4);
+        clear luh2
+        gpp=gpp.*luh2_ffrac;
+    end
     
     %Get LAI data
     lai=squeeze(lpj_to_grid_func_centre('lai_2001_2014',1,0));
@@ -131,6 +152,21 @@ for ss=1:nsims
     
     write_netcdf_lpjg(npp,variable,modname,disttype,realisation,year,...
         units,variable_longname,output_dir,note1);
+
+    %GPP
+    if ss==1 || ss==4
+        variable='GPP';
+        variable_longname='Gross primary productivity';
+        units='kg C m-2 yr-1';
+        disttype=dtype{ss};
+        realisation=dreal{ss};
+        modname='LPJ-GUESS';
+        year=2014;
+        note1='This data is the mean over the period 2001-2014, the year variable in this file is nominal';
+
+        write_netcdf_lpjg(gpp,variable,modname,disttype,realisation,year,...
+            units,variable_longname,output_dir,note1);
+    end
     
     %LAI
     variable='LAI';

@@ -16,15 +16,15 @@
 % 12.01.19
 
 use_cvegmask=false; %Mask by a minimum simulated vegetation biomass density (not recommended for C calculations)
-use_fmask=false; %Mask by current forest area
+use_fmask=true; %Mask by current forest area
 ccmask=false; %Use a closed-canopy forest mask (if use_fmask=true)
 use_bmask=true; %Mask by temperate/boreal biomes
 farea_opt='luh2'; %Forest area weighting to use, either luh2 or hansen (luh2 recommended)
 
 absplots=false; %Make plots with absolute values
 relplots=false; %Make plots with relative values
-regstats_gridcell=false; %Calculate regional stats at gridcell level
-regstats_sum=true; %Calculate stats based on regional sums
+regstats_gridcell=true; %Calculate regional stats at gridcell level
+regstats_sum=false; %Calculate stats based on regional sums
 
 writetxt=false; %Write array to text file
 outfile_name='simplemodel_closedcanopy_best_est_100patch_5pClosedCanopyCover_Pugh2019diff.txt';
@@ -39,6 +39,12 @@ ocean_file='/Users/pughtam/data/ESA_landcover/esa_05_landcover.mat'; %Ocean mask
 luh2_dir='./data/';
 luh2_file='lu_1700_2015_luh2_aggregate_sum2x2_midpoint_urban_orig_v20_2001_2014';
 
+%--- Checks ---
+if regstats_gridcell && regstats_sum
+    error('Only one of regstats_gridcell and regstats_sum should be caculated at a time')
+end
+
+
 %--- Read in data ---
 
 % Read cpool and cflux data
@@ -46,14 +52,17 @@ cveg1=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standard_nat_2014.nc'],'Cveg'),[
 clitter1=permute(ncread([lpjg_dir,'/Clitter_LPJ-GUESS_standard_nat_2014.nc'],'Clitter'),[2 1]);
 csoil1=permute(ncread([lpjg_dir,'/Csoil_LPJ-GUESS_standard_nat_2014.nc'],'Csoil'),[2 1]);
 npp1=permute(ncread([lpjg_dir,'/NPP_LPJ-GUESS_standard_nat_2014.nc'],'NPP'),[2 1]);
+gpp1=permute(ncread([lpjg_dir,'/GPP_LPJ-GUESS_standard_nat_2014.nc'],'GPP'),[2 1]);
 ctau1=cveg1./npp1;
-
+ctauecogpp1=(cveg1+clitter1+csoil1)./gpp1;
 
 cveg2=permute(ncread([lpjg_dir,'/Cveg_LPJ-GUESS_standard_anthro_2014.nc'],'Cveg'),[2 1]);
 clitter2=permute(ncread([lpjg_dir,'/Clitter_LPJ-GUESS_standard_anthro_2014.nc'],'Clitter'),[2 1]);
 csoil2=permute(ncread([lpjg_dir,'/Csoil_LPJ-GUESS_standard_anthro_2014.nc'],'Csoil'),[2 1]);
 npp2=permute(ncread([lpjg_dir,'/NPP_LPJ-GUESS_standard_anthro_2014.nc'],'NPP'),[2 1]);
+gpp2=permute(ncread([lpjg_dir,'/GPP_LPJ-GUESS_standard_anthro_2014.nc'],'GPP'),[2 1]);
 ctau2=cveg2./npp2;
+ctauecogpp2=(cveg2+clitter2+csoil2)./gpp2;
 
 [cvegmask,fmask,bmask,ffrac,bmask_temp,bmask_bor]=readmasks_func(use_cvegmask,true,ccmask,use_bmask,lpjg_dir,fmask_dir,fmask_file,bmask_dir);
 
@@ -74,12 +83,14 @@ if strcmp(farea_opt,'luh2')
     %Correct natural simulation by LUH2 prim+sec cover fraction
     cveg1=cveg1.*luh2_ffrac;
     npp1=npp1.*luh2_ffrac;
+    gpp1=gpp1.*luh2_ffrac;
     csoil1=csoil1.*luh2_ffrac;
     clitter1=clitter1.*luh2_ffrac;
 elseif strcmp(farea_opt,'hansen')
     %Convert LUH2 simulation to values per m2 prim+sec cover (for later scaling by Hansen canopy cover fraction)
     cveg2=cveg2./luh2_ffrac;
     npp2=npp2./luh2_ffrac;
+    gpp2=gpp2./luh2_ffrac;
     csoil2=csoil2./luh2_ffrac;
     clitter2=clitter2./luh2_ffrac;
 else
@@ -91,40 +102,52 @@ end
 if use_cvegmask
     cveg1=cveg1.*cvegmask;
     npp1=npp1.*cvegmask;
+    gpp1=gpp1.*cvegmask;
     csoil1=csoil1.*cvegmask;
     clitter1=clitter1.*cvegmask;
     ctau1=ctau1.*cvegmask;
+    ctauecogpp1=ctauecogpp1.*cvegmask;
     cveg2=cveg2.*cvegmask;
     npp2=npp2.*cvegmask;
+    gpp2=gpp2.*cvegmask;
     csoil2=csoil2.*cvegmask;
     clitter2=clitter2.*cvegmask;
     ctau2=ctau2.*cvegmask;
+    ctauecogpp2=ctauecogpp2.*cvegmask;
 end
 
 if use_fmask
     cveg1=cveg1.*fmask;
     npp1=npp1.*fmask;
+    gpp1=gpp1.*fmask;
     csoil1=csoil1.*fmask;
     clitter1=clitter1.*fmask;
     ctau1=ctau1.*fmask;
+    ctauecogpp1=ctauecogpp1.*fmask;
     cveg2=cveg2.*fmask;
     npp2=npp2.*fmask;
+    gpp2=gpp2.*fmask;
     csoil2=csoil2.*fmask;
     clitter2=clitter2.*fmask;
     ctau2=ctau2.*fmask;
+    ctauecogpp2=ctauecogpp2.*fmask;
 end
 
 if use_bmask
     cveg1=cveg1.*bmask;
     npp1=npp1.*bmask;
+    gpp1=gpp1.*bmask;
     csoil1=csoil1.*bmask;
     clitter1=clitter1.*bmask;
     ctau1=ctau1.*bmask;
+    ctauecogpp1=ctauecogpp1.*bmask;
     cveg2=cveg2.*bmask;
     npp2=npp2.*bmask;
+    gpp2=gpp2.*bmask;
     csoil2=csoil2.*bmask;
     clitter2=clitter2.*bmask;
     ctau2=ctau2.*bmask;
+    ctauecogpp2=ctauecogpp2.*bmask;
 end
 
 % Absolute difference arrays
@@ -255,6 +278,8 @@ if regstats_sum
         clitter2_area=clitter2.*garea;
         npp1_area=npp1.*garea;
         npp2_area=npp2.*garea;
+        gpp1_area=gpp1.*garea;
+        gpp2_area=gpp2.*garea;
     elseif strcmp(farea_opt,'hansen')
         %Values are per prim+sec (natural) area and need correcting by forest cover fraction (here canopy cover fraction)
         cveg1_area=cveg1.*farea;
@@ -265,12 +290,16 @@ if regstats_sum
         clitter2_area=clitter2.*farea;
         npp1_area=npp1.*farea;
         npp2_area=npp2.*farea;
+        gpp1_area=gpp1.*farea;
+        gpp2_area=gpp2.*farea;
     end
     
     cveg1_boreal=cveg1_area(bmask_bor==1);
     cveg2_boreal=cveg2_area(bmask_bor==1);
     npp1_boreal=npp1_area(bmask_bor==1);
     npp2_boreal=npp2_area(bmask_bor==1);
+    gpp1_boreal=gpp1_area(bmask_bor==1);
+    gpp2_boreal=gpp2_area(bmask_bor==1);
     csoil1_boreal=csoil1_area(bmask_bor==1);
     csoil2_boreal=csoil2_area(bmask_bor==1);
     clitter1_boreal=clitter1_area(bmask_bor==1);
@@ -282,6 +311,8 @@ if regstats_sum
     ctaueco1_boreal=(nansum(csoil1_boreal)+nansum(clitter1_boreal)+nansum(cveg1_boreal))/nansum(npp1_boreal);
     ctaueco2_boreal=(nansum(csoil2_boreal)+nansum(clitter2_boreal)+nansum(cveg2_boreal))/nansum(npp2_boreal);
     ctaueco_diff_allboreal_perc=((ctaueco2_boreal-ctaueco1_boreal)/ctaueco1_boreal)*100;
+    ctauecogpp1_boreal=(nansum(csoil1_boreal)+nansum(clitter1_boreal)+nansum(cveg1_boreal))/nansum(gpp1_boreal);
+    ctauecogpp2_boreal=(nansum(csoil2_boreal)+nansum(clitter2_boreal)+nansum(cveg2_boreal))/nansum(gpp2_boreal);
     cveg1_sum_boreal=nansum(cveg1_boreal)/1e12; %In Pg C
     cveg2_sum_boreal=nansum(cveg2_boreal)/1e12; %In Pg C
     csoil1_sum_boreal=nansum(csoil1_boreal)/1e12; %In Pg C
@@ -293,6 +324,8 @@ if regstats_sum
     cveg2_temp=cveg2_area(bmask_temp==1);
     npp1_temp=npp1_area(bmask_temp==1);
     npp2_temp=npp2_area(bmask_temp==1);
+    gpp1_temp=gpp1_area(bmask_temp==1);
+    gpp2_temp=gpp2_area(bmask_temp==1);
     csoil1_temp=csoil1_area(bmask_temp==1);
     csoil2_temp=csoil2_area(bmask_temp==1);
     clitter1_temp=clitter1_area(bmask_temp==1);
@@ -305,6 +338,8 @@ if regstats_sum
     ctaueco1_temp=(nansum(csoil1_temp)+nansum(clitter1_temp)+nansum(cveg1_temp))/nansum(npp1_temp);
     ctaueco2_temp=(nansum(csoil2_temp)+nansum(clitter2_temp)+nansum(cveg2_temp))/nansum(npp2_temp);
     ctaueco_diff_alltemp_perc=((ctaueco2_temp-ctaueco1_temp)/ctaueco1_temp)*100;
+    ctauecogpp1_temp=(nansum(csoil1_temp)+nansum(clitter1_temp)+nansum(cveg1_temp))/nansum(gpp1_temp);
+    ctauecogpp2_temp=(nansum(csoil2_temp)+nansum(clitter2_temp)+nansum(cveg2_temp))/nansum(gpp2_temp);
     cveg1_sum_temp=nansum(cveg1_temp)/1e12; %In Pg C
     cveg2_sum_temp=nansum(cveg2_temp)/1e12; %In Pg C
     csoil1_sum_temp=nansum(csoil1_temp)/1e12; %In Pg C
