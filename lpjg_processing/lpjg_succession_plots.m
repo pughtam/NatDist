@@ -25,9 +25,6 @@ for region=1:2
 
     pfts={'BNE','BINE','IBS'};
 
-    lai=dlmread([lpjg_dir,'/lai.out'],'',1,0);
-    lai_dim=size(lai);
-
     cmass=dlmread([lpjg_dir,'/cmass.out'],'',1,0);
     cmass_dim=size(cmass);
 
@@ -37,12 +34,10 @@ for region=1:2
     maxcmass=max(cmass(:,16));
 
     cmass_site=NaN(nsites,nyear,cmass_dim(2)-3);
-    lai_site=NaN(nsites,nyear,lai_dim(2)-3);
     for nn=1:nsites
         yy_min=nn*nyear-nyear+1;
         yy_max=nn*nyear;
         cmass_site(nn,:,:)=cmass(yy_min:yy_max,4:cmass_dim(2));
-        lai_site(nn,:,:)=lai(yy_min:yy_max,4:lai_dim(2));
     end
     clear nn yy_min yy_max
 
@@ -86,11 +81,3 @@ for nn=1:9
     end
 end
 clear nn
-
-
-
-
-
-
-
-
