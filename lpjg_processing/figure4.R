@@ -1,4 +1,4 @@
-# Code for producing Figure 3
+# Code for producing Figure 4
 #
 # C. Senf
 # 01.02.2021

@@ -1,4 +1,4 @@
-# Code for producing Figure 2 based on LPJ-Output
+# Code for producing Figure 3 based on LPJ-Output
 #
 # C. Senf
 # 01.02.2021
