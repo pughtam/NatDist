@@ -71,7 +71,7 @@ lons=-180:0.5:179.5;
 lats=-90:0.5:89.5;
 
 figure
-cmap=[0.9 0.9 0.9; 0.5 0 0; 0 0.5 0];
+cmap=[0.9 0.9 0.9; 0.7 0 0; 0 0 0.7];
 
 colormap(cmap)
 axesm('MapProjection','robinson','MapLatLimit',[23 80])
