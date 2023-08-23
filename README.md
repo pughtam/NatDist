@@ -42,6 +42,7 @@ Folder: lpjg_processing
 - distint_site_extract, extract disturbance return periods for specific sites to provide data for Table S4.
 - compare_biomass_esa.m, extract biomass information from ESA CCI biomass for each of the 77 landscapes and compare to LPJ-GUESS results for the same locations (Figure S9).
 - trait_space_map.m, for each grid cell in the LPJ-GUESS simulations, calculate whether it falls within the trait and climate space of the 77 landscapes (Figure S3).
+- lpjg_succession_plots.m, make plot for succession tests (Figure S1).
 - figure3.R, code for producing Figure 3 from files created by plot_global_distint_map.m
 - figure4.R, code for producing Figure 4 from files created by age_dist_plot.m
 
