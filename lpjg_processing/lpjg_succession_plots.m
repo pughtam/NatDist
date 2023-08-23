@@ -61,10 +61,6 @@ for region=1:2
         ps=polyshape([pft_trans_obs1(nn) pft_trans_obs2(nn) pft_trans_obs2(nn) pft_trans_obs1(nn)],[0 0 maxcmass maxcmass]);
         p1=plot(ps);
         set(p1,'linestyle','none','FaceColor',[0.3 0.3 0.3])
-        %l1=line([pft_trans_obs1(nn) pft_trans_obs1(nn)],[0 maxcmass]);
-        %l2=line([pft_trans_obs2(nn) pft_trans_obs2(nn)],[0 maxcmass]);
-        %set(l1,'color',[0.3 0.3 0.3])
-        %set(l2,'color',[0.3 0.3 0.3])
         title(titles{nn})
     end
     if region==2
