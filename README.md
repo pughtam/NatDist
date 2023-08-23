@@ -52,4 +52,10 @@ Folder: lpjg_processing/helper_functions
 - global_grid_area.m, calculate the area of each grid cell.
 - lpj_to_grid_func_centre.m, function to read in a LPJ-GUESS output file and reformat it into a multi-dimensional array suitable for making Matlab plots with.
 
+Folder: lpjg_processing/netcdf_creation
+- write_netcdf_lpjg.m, function to write raw LPJ-GUESS from gridded simulations to netcdfs for use by the rest of this processing chain.
+- write_netcdf_lpjg_site.m, function to write raw LPJ-GUESS from site simulations to netcdfs for use by the rest of this processing chain.
+- lpjg_to_netcdf.m, master function to read the LPJ-GUESS gridded data and call the routine to write it to netcdf
+- lpjg_to_netcdf_site.m, master function to read the LPJ-GUESS site data and call the routine to write it to netcdf
+Note: It is the netcdfs from these functions that are included in the associated data product, as they are self-documenting. Raw LPJ-GUESS text outputs used by the files in these outputs are not archived.
 
