@@ -3,8 +3,6 @@
 % Use a tripartite masking system. First mask by any areas where forest is not simulated (based on vegetation biomass). Then mask
 % by current forest area. The mask by whether it is in the temperate or boreal biome.
 %
-% Should be fed an LPJ-GUESS tslice file as input.
-%
 % Dependencies:
 % - readmasks_func.m
 % - lpj_to_grid_func_centre.m

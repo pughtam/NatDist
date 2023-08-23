@@ -4,7 +4,6 @@ The anthropogenic imprint on temperate and boreal forest demography and carbon t
 Thomas A. M. Pugh, Lund University, Sweden, thomas.pugh@nateko.lu.se
 Cornelius Senf, Technical University of Munich, corneliussenf@gmail.com
 
-
 ## Description
 Scripts underlying analysis in:
 Thomas A. M. Pugh, Rupert Seidl, Daijun Liu, Mats Lindeskog, Louise P. Chini, Cornelius Senf, The anthropogenic imprint on temperate and boreal forest demography and carbon turnover.
@@ -18,7 +17,8 @@ Folder: disturbance_rates
 
 Folder: ESA_processing
 - esa_broadleaf_frac_0p5deg.m, classify ESA landcover into broadleaf and needleleaf classes
-- lpjg_foresttype_input.m, Create an input file for LPJ-GUESS that specifies whether the forest type in each grid cell is broadleaf, needleleaf or mixed
+- lpjg_foresttype_input.m, create an input file for LPJ-GUESS that specifies whether the forest type in each grid cell is broadleaf, needleleaf or mixed
+- esa_lu_read.m, read and process the ESA landcover into general landcover types. The resulting landcover files is only used for the ocean mask in plots.
 
 Folder: forest_mask
 - hansen_forest_canopy_frac_calc.m, read in the forest cover from Hansen et al. (2013) and calculate the open and closed canopy forest cover, actual canopy cover and actual canopy area.
@@ -29,19 +29,21 @@ Folder: obs_biomes
 - vegmap18.out, data file for Haxeltine and Prentice biomes
 
 Folder: lpjg_processing
-- trait_to_lpjg_mapping_tempbor.m, script to map trait values from species level to LPJ-GUESS PFTs (Figure S4, parameterisation for LPJ-GUESS)
-- plot_global_distint_diff_map.m, plot map of difference between disturbance rotation periods from two different simulations and write processed data out to a text file (feeds into Figure 2).
-- plot_global_distint_uncer_map.m, plot map of uncertainty in disturbance rotation periods, showing the absolute range of uncertainty divided by the best estimate (Figure S2, feeds into Figure 2).
+- trait_to_lpjg_mapping_tempbor.m, script to map trait values from species level to LPJ-GUESS PFTs (Figure S2, parameterisation for LPJ-GUESS)
+- plot_global_distint_uncer_map.m, plot map of uncertainty in disturbance rotation periods, showing the absolute range of uncertainty divided by the best estimate (Figure S4).
 - plot_global_cturn_diff_map.m, plot map of difference in carbon turnover from two different simulations and write processed data out to a text file (used for C turnover calculations in text).
-- age_dist_plot.m, create age structure plots by region based on LPJ-GUESS output, including Figure S5 and Figure S6.
+- age_dist_plot.m, create age structure plots by region based on LPJ-GUESS output, including Figure S7 and Figure S8. Creates files used to draw Figure 4 using figure4.R.
 - gfad_breakdown_region.m, split up the GFAD age class data into regions. Dependency for age_dist_plot.m
 - readmasks_func.m, create the masks for low vegetation C mass, low forested area or non temperate/boreal biomes.
-- hengl_lpjg_biome_comp.m, plot biomes from LPJ-GUESS in comparison to those from observation-based estimates (Figure S1).
+- hengl_lpjg_biome_comp.m, plot biomes from LPJ-GUESS in comparison to those from observation-based estimates (Figure S5).
 - lpjg_biome_func.m, function to convert LPJ-GUESS LAI output into a biome classification.
-- plot_global_distint_map.m, plot map of disturbance rotation periods and write processed data out to a text file.
-- plot_pft_frac_map.m, script to make map of fraction of tree cover which is broadleaf for LPJ-GUESS and ESA data (Figure S2).
-- figure2.R, code for producing Figure 2
-- figure3.R, code for producing Figure 3
+- plot_global_distint_map.m, plot map of disturbance rotation periods and write processed data out to a text file (creates files used to draw Figure 3 using figure3.R).
+- plot_pft_frac_map.m, script to make map of fraction of tree cover which is broadleaf for LPJ-GUESS and ESA data (Figure S6).
+- distint_site_extract, extract disturbance return periods for specific sites to provide data for Table S4.
+- compare_biomass_esa.m, extract biomass information from ESA CCI biomass for each of the 77 landscapes and compare to LPJ-GUESS results for the same locations (Figure S9).
+- trait_space_map.m, for each grid cell in the LPJ-GUESS simulations, calculate whether it falls within the trait and climate space of the 77 landscapes (Figure S3).
+- figure3.R, code for producing Figure 3 from files created by plot_global_distint_map.m
+- figure4.R, code for producing Figure 4 from files created by age_dist_plot.m
 
 Folder: lpjg_processing/helper_functions
 - gfad_regions.m, script to take the GFAD regions and process them into something more accessible for plotting.
